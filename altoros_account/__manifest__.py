@@ -12,6 +12,8 @@
     ],
     'data': [
         'security/ir.model.access.csv',
+
+        'views/account_move_views.xml',
     ],
     'qweb': [
         'static/src/xml/*.xml',

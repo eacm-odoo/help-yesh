@@ -14,7 +14,10 @@ DEPARTMENT_FIELDS = [
 class AccountMove(models.Model):
     _inherit = 'account.move'
 
-    def _update_aml_revenue(self):
+    revenue_ids = fields.One2many('account.move.line.revenue', 'move_id', string="Invoice Line Revenue")
+    split_revenue = fields.Boolean("Split revenue by Department?", default=True)
+
+    def update_aml_revenue(self):
         for record in self:
             # All departments of this invoice
             move_departments = [record[dep] for dep in DEPARTMENT_FIELDS if record[dep]]
@@ -36,17 +39,15 @@ class AccountMove(models.Model):
                         'revenue_ids': [(0, 0, {'move_line_id': line.id})]
                     })
 
-            return True
-
     @api.model_create_multi
     def create(self, vals_list):
         records = super(AccountMove, self).create(vals_list)
-        records._update_aml_revenue()
+        records.update_aml_revenue()
         return records
 
     def write(self, vals):
         res = super(AccountMove, self).write(vals)
-        self._update_aml_revenue()
+        self.update_aml_revenue()
         return res
 
 
@@ -54,6 +55,3 @@ class AccountMoveLine(models.Model):
     _inherit = 'account.move.line'
 
     revenue_ids = fields.One2many('account.move.line.revenue', 'move_line_id', string="Invoice Line Revenue")
-
-
-
