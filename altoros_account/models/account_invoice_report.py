@@ -6,7 +6,7 @@ from odoo import fields, models
 class AccountInvoiceReport(models.Model):
     _inherit = 'account.invoice.report'
 
-    invoice_department = fields.Char(string="Sales Department")
+    invoice_department = fields.Char(string="Production Department")
 
     def _select(self):
         select = super()._select()
