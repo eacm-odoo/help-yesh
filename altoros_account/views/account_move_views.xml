@@ -31,6 +31,26 @@ if records:
                     <attribute name="required">0</attribute>
                     <attribute name="attrs">{'required': [('split_revenue', '=', True)]}</attribute>
                 </field>
+
+                <field name="x_studio_currentnew" position="attributes">
+                    <attribute name="required">0</attribute>
+                    <attribute name="attrs">{'required': [('split_revenue', '=', True)]}</attribute>
+                </field>
+
+                <field name="x_studio_sales_type" position="attributes">
+                    <attribute name="required">0</attribute>
+                    <attribute name="attrs">{'required': [('split_revenue', '=', True)]}</attribute>
+                </field>
+
+                <field name="x_studio_revenue_currentnew" position="attributes">
+                    <attribute name="required">0</attribute>
+                    <attribute name="attrs">{'required': [('split_revenue', '=', True)]}</attribute>
+                </field>
+
+                <field name="x_studio_revenue_sales_type_1" position="attributes">
+                    <attribute name="required">0</attribute>
+                    <attribute name="attrs">{'required': [('split_revenue', '=', True)]}</attribute>
+                </field>
             </field>
         </record>
     </data>
