@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <record id="project_report_xls_action" model="ir.actions.report">
+            <field name="name">Project Report</field>
+            <field name="model">account.move</field>
+            <field name="report_type">xlsx</field>
+            <field name="report_name">altoros.project_report_xlsx</field>
+            <field name="print_report_name">'%s %s %s' % (object.partner_id.name, object.project_id.name,
+                object.billing_month)
+            </field>
+            <field name="binding_model_id" ref="account.model_account_move"/>
+            <field name="binding_type">report</field>
+        </record>
+
+        <report
+            id="invoices_changes_report_xlsx"
+            model="account.move"
+            string="Invoice changes"
+            report_type="xlsx"
+            name="altoros.invoices_changes_report_xlsx"
+            file="invoices_changes_report_xlsx"
+            attachment_use="False"
+        />
+
+        <report
+            id="timesheets_to_approve_report_xlsx"
+            model="project.task"
+            string="Timesheets to approve"
+            report_type="xlsx"
+            name="altoros.timesheets_to_approve_report_xlsx"
+            file="timesheets_to_approve_report_xlsx"
+            attachment_use="False"
+        />
+
+    </data>
+</odoo>

@@ -1,0 +1,33 @@
+<odoo>
+    <record id="timesheets_to_approve_wizard_form_view" model="ir.ui.view">
+        <field name="name">timesheets.to.approve.wizard.form.view</field>
+        <field name="model">timesheets.to.approve.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Timesheets to approve">
+                 <group>
+                    <field name="department_id"/>
+                    <field name="start_date"/>
+                    <field name="end_date"/>
+                 </group>
+                <footer>
+                    <button name="create_report" string="Create" type="object"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <act_window name="Timesheets to approve"
+        id="action_timesheets_to_approve_wizard_form_view"
+        res_model="timesheets.to.approve.wizard"
+        binding_model="timesheets.to.approve.wizard"
+        binding_views="form"
+        view_mode="form"
+        target="new"
+    />
+
+    <menuitem id="action_timesheets_to_approve_action"
+      action="action_timesheets_to_approve_wizard_form_view"
+      parent="hr_timesheet.timesheet_menu_root"
+      sequence="100"/>
+</odoo>

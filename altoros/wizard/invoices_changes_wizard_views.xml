@@ -1,0 +1,38 @@
+<odoo>
+    <record id="invoices_changes_wizard_form_view" model="ir.ui.view">
+        <field name="name">invoices.changes.wizard.form.view</field>
+        <field name="model">invoices.changes.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Invoices Changes">
+                <div>
+                    Invoices created during the period from
+                    <field name="invoice_start_date"/>
+                    to
+                    <field name="invoice_end_date"/>
+                     </div>
+                 <group>
+                    <field name="start_date"/>
+                    <field name="end_date"/>
+                 </group>
+                <footer>
+                    <button name="create_report" string="Create" type="object"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <act_window name="Invoices Changes"
+        id="action_invoices_changes_wizard_form_view"
+        res_model="invoices.changes.wizard"
+        binding_model="invoices.changes.wizard"
+        binding_views="form"
+        view_mode="form"
+        target="new"
+    />
+
+    <menuitem id="invoices_changes_action"
+      action="action_invoices_changes_wizard_form_view"
+      parent="account.menu_finance_reports"
+      sequence="5"/>
+</odoo>

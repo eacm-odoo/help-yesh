@@ -1,0 +1,8 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_rate_employee,access_rate_employee,model_rate_employee,base.group_user,1,1,1,1
+access_rate_employee_timesheet,access_rate_employee_timesheet,model_rate_employee_timesheet,base.group_user,1,1,1,1
+access_department_rate,access_department_rate,model_department_rate,base.group_user,1,1,1,1
+access_timesheet_filling,access_timesheet_filling,model_timesheet_filling,base.group_user,1,1,1,1
+access_project_project,access_project_project,model_project_project,base.group_user,1,1,1,1
+access_sales_type_revenue,access_sales_type_revenue,model_sales_type_revenue,base.group_user,1,1,1,1
+access_sales_type_departments,access_sales_type_departments,model_sales_type_departments,base.group_user,1,1,1,1

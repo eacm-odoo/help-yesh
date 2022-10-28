@@ -1,0 +1,23 @@
+<odoo>
+
+        <record id="view_timesheet_filling_form" model="ir.ui.view">
+            <field name="name">timesheet.filling.form</field>
+            <field name="model">timesheet.filling</field>
+            <field name="arch" type="xml">
+                <form string="Timesheet filling">
+                     <group>
+                        <field name="project_id"/>
+                        <field name="start_date"/>
+                        <field name="end_date"/>
+                        <field name="select_billing_month"/>
+                     </group>
+                    <footer>
+                        <button name="create_invoice" string="Create" type="object"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+
+                </form>
+            </field>
+        </record>
+
+</odoo>

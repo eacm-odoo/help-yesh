@@ -1,0 +1,33 @@
+<odoo>
+
+    <record id="rate_employee_tree" model="ir.ui.view">
+        <field name="name">rate.employee.tree</field>
+        <field name="model">rate.employee</field>
+        <field name="arch" type="xml">
+            <tree editable="bottom">
+                <field name="employee_id"/>
+                <field name="project_id"/>
+                <field name="start_date"/>
+                <field name="end_date"/>
+                <field name="sales_type"/>
+                <field name="rate"/>
+                <field name="currency_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="rate_employee_action" model="ir.actions.act_window">
+        <field name="name">Rate employee</field>
+        <field name="res_model">rate.employee</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="view_mode">tree</field>
+    </record>
+
+    <menuitem
+        id="menu_hr_employee_rate"
+        name="Employee rates"
+        parent="hr.menu_hr_employee_payroll"
+        action="rate_employee_action"
+        sequence="50"/>
+
+</odoo>

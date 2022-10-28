@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <record id="view_account_move_form_inherit" model="ir.ui.view">
+            <field name="name">inherit.invoice.form</field>
+            <field name="model">account.move</field>
+            <field name="inherit_id" ref="account.view_move_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='partner_id']" position="replace">
+                    <field name="partner_id" nolabel="1" attrs="{'invisible': [('type', 'not in', ('out_invoice', 'out_refund', 'in_invoice', 'in_refund', 'out_receipt', 'in_receipt'))]}"/>
+                </xpath>
+                <xpath expr="//page[@name='other_info']" position="after">
+                    <page name="timesheets" string="Timesheets">
+                        <group>
+                            <group>
+                                <field name="project_id"/>
+                            </group>
+                            <group>
+                                <field name="start_date"/>
+                                <field name="end_date"/>
+                            </group>
+                            <field name="rate_employee_timesheet_ids">
+                                <tree editable="bottom">
+                                    <field name="date" optional="show"/>
+                                    <field name="task_id" optional="show"/>
+                                    <field name="employee_id" optional="show"/>
+                                    <field name="description" optional="show"/>
+                                    <field name="unit_amount" optional="show"/>
+                                    <field name="rate" optional="show"/>
+                                    <field name="total_value" optional="show"/>
+                                    <field name="department_id" optional="show"/>
+                                    <field name="sales_type" optional="show"/>
+                                    <field name="comment" optional="show"/>
+                                    <field name="account_move_id" invisible="True"/>
+                                </tree>
+                            </field>
+                            <group>
+                                <div class="oe_right oe_button_box">
+                                    <button string="Add to invoice" name="set_invoice_line_ids" type="object" context="{'is_tomesheets_context': True}"
+                                            class="btn-primary"/>
+                                </div>
+                                <field name="total_price"/>
+                            </group>
+                        </group>
+                    </page>
+                    <page string="Analytics">
+                        <group>
+                            <field name="department_rate_ids" nolabel="1">
+                                <tree editable="bottom" delete="0" create="0">
+                                    <field name="department_id" optional="show" readonly="1" force_save="1"/>
+                                    <field name="total_hours_dpt" optional="show" readonly="1" force_save="1"/>
+                                    <field name="total_department_value" optional="show" readonly="1" force_save="1"/>
+                                    <field name="account_move_id" invisible="True" force_save="1"/>
+                                    <field name="discounts_by" optional="hide"/>
+                                    <field name="disc_percents" optional="show"/>
+                                    <field name="with_discount" optional="show" readonly="1" force_save="1"/>
+                                    <field name="disc_difference" invisible="1"/>
+                                    <field name="number_sales_types_in_dept" invisible="1"/>
+                                    <field name="discount_comment" optional="hide" force_save="1"/>
+                                </tree>
+                            </field>
+                        </group>
+                        <group>
+                            <div class="oe_right oe_button_box">
+                                    <button string="Add to invoice" name="set_invoice_line_ids" type="object" context="{'is_tomesheets_context': False}"
+                                            class="btn-primary"/>
+                                </div>
+                            <field name="total_with_discount"/>
+                            <field name="split_revenue" invisible="True"/>
+                        </group>
+                        <group>
+                            <group string="Sales Type">
+                                <field name="sales_type"/>
+                                <field name="x_studio_currentnew" invisible="True"/>
+                                <field name="x_studio_sales_type" invisible="True"/>
+                                <field name="x_studio_sales_type_2" invisible="True"/>
+                                <field name="x_studio_sales_type_3_1" invisible="True"/>
+                            </group>
+                            <group string="Sales Type Revenue">
+                                <field name="sales_type_revenue"/>
+                                <field name="x_studio_revenue_currentnew" invisible="True"/>
+                                <field name="x_studio_revenue_sales_type_1" invisible="True"/>
+                                <field name="x_studio_revenue_sales_type_2" invisible="True"/>
+                                <field name="x_studio_revenue_sales_type_3" invisible="True"/>
+                            </group>
+                        </group>
+                        <group>
+                            <field name="sales_type_revenue_ids" nolabel="1">
+                                <tree editable="bottom">
+                                    <field name="sales_type" readonly="1"/>
+                                    <field name="sales_type_revenue" readonly="1"/>
+                                </tree>
+                            </field>
+                        </group>
+                        <group>
+                            <field name="sales_type_departments_ids" nolabel="1" invisible="1">
+                                <tree editable="bottom">
+                                    <field name="dept_id" readonly="1"/>
+                                    <field name="sales_type_by_dept" readonly="1"/>
+                                    <field name="sales_revenue_by_dept" readonly="1"/>
+                                    <field name="revenue_with_disc" readonly="1"/>
+                                </tree>
+                            </field>
+                        </group>
+                    </page>
+                </xpath>
+                <xpath expr="//field[@name='team_id']" position="after">
+                    <field name="billing_month"/>
+                    <field name="billing_year"/>
+                    <field name="project_owner"/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>
