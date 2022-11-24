@@ -32,8 +32,8 @@ class RateEmployee(models.Model):
 
     def validate_data(self, vals):
         """Date validate"""
-        start_date = datetime.strptime(vals.get("start_date"), "%Y-%m-%d").date() or self.start_date
-        end_date = datetime.strptime(vals.get("end_date"), "%Y-%m-%d").date() or self.end_date
+        start_date = datetime.strptime(vals.get("start_date"), "%Y-%m-%d").date() if vals.get("start_date") else self.start_date
+        end_date = datetime.strptime(vals.get("end_date"), "%Y-%m-%d").date() if vals.get("end_date") else self.end_date
         if start_date > end_date:
             raise UserError(_("The start date cannot be greater than the end date"))
         actual_currency_id = self.env["rate.employee"].search([("project_id", "=", vals.get("project_id"))],
