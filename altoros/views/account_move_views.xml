@@ -71,17 +71,9 @@
                         <group>
                             <group string="Sales Type">
                                 <field name="sales_type"/>
-                                <field name="x_studio_currentnew" invisible="True"/>
-                                <field name="x_studio_sales_type" invisible="True"/>
-                                <field name="x_studio_sales_type_2" invisible="True"/>
-                                <field name="x_studio_sales_type_3_1" invisible="True"/>
                             </group>
                             <group string="Sales Type Revenue">
                                 <field name="sales_type_revenue"/>
-                                <field name="x_studio_revenue_currentnew" invisible="True"/>
-                                <field name="x_studio_revenue_sales_type_1" invisible="True"/>
-                                <field name="x_studio_revenue_sales_type_2" invisible="True"/>
-                                <field name="x_studio_revenue_sales_type_3" invisible="True"/>
                             </group>
                         </group>
                         <group>
@@ -101,6 +93,62 @@
                                     <field name="revenue_with_disc" readonly="1"/>
                                 </tree>
                             </field>
+                        </group>
+                    </page>
+                    <page string="Analytics (Old Data)" groups="base.group_erp_manager">
+                        <group>
+                            <field name="x_studio_billing_month"/>
+                            <field name="x_studio_billing_year"/>
+                            <field name="x_studio_customer_project"/>
+                            <field name="x_studio_project"/>
+                            <field name="x_studio_project_owner_bl"/>
+                            <field name="x_studio_licence_"/>
+                        </group>
+                        <group>
+                            <group string="Departments">
+                                <field name="x_studio_department_1_1"/>
+                                <field name="x_studio_department_2"/>
+                                <field name="x_studio_department_3"/>
+                                <field name="x_studio_department_4"/>
+                                <field name="x_studio_department_5"/>
+                            </group>
+                            <group string="Revenue by Department">
+                                <field name="x_studio_revenue_1"/>
+                                <field name="x_studio_revenue_2"/>
+                                <field name="x_studio_revenue_3"/>
+                                <field name="x_studio_revenue_4"/>
+                                <field name="x_studio_revenue_5"/>
+                            </group>
+                        </group>
+                        <group>
+                            <group string="Discounts">
+                                <field name="x_studio_discount_1_1"/>
+                                <field name="x_studio_discount_2"/>
+                                <field name="x_studio_discount_3"/>
+                                <field name="x_studio_discount_4"/>
+                                <field name="x_studio_discount_5"/>
+                            </group>
+                            <group string="Comments for Discounts">
+                                <field name="x_studio_comment_1"/>
+                                <field name="x_studio_comment_2"/>
+                                <field name="x_studio_comment_3"/>
+                                <field name="x_studio_comment_4"/>
+                                <field name="x_studio_comment_5"/>
+                            </group>
+                        </group>
+                        <group>
+                            <group string="Sales Type">
+                                <field name="x_studio_currentnew"/>
+                                <field name="x_studio_sales_type"/>
+                                <field name="x_studio_sales_type_2"/>
+                                <field name="x_studio_sales_type_3_1"/>
+                            </group>
+                            <group string="Sales Type Revenue">
+                                <field name="x_studio_revenue_currentnew"/>
+                                <field name="x_studio_revenue_sales_type_1"/>
+                                <field name="x_studio_revenue_sales_type_2"/>
+                                <field name="x_studio_revenue_sales_type_3"/>
+                            </group>
                         </group>
                     </page>
                 </xpath>

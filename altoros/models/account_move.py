@@ -1,5 +1,4 @@
 from datetime import date
-from collections import defaultdict
 
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
@@ -20,19 +19,7 @@ class AccountMove(models.Model):
 
     split_revenue = fields.Boolean(string="Split revenue by Department?")
     sales_type = fields.Selection(selection=[("Current", "Current"), ("New", "New")], string="Current/New")
-    x_studio_currentnew = fields.Selection(selection=[("Current", "Current"), ("New", "New")],
-                                           string="Current/New", default="Current")
-    x_studio_sales_type = fields.Selection(selection=[
-        ("base", "Base"), ("upsales", "Upsales"), ("cross-sell", "Cross-sell")], string="Sales Type 1")
-    x_studio_sales_type_2 = fields.Selection(selection=[
-        ("base", "Base"), ("upsales", "Upsales"), ("cross-sell", "Cross-sell")], string="Sales Type 2")
-    x_studio_sales_type_3_1 = fields.Selection(selection=[
-        ("base", "Base"), ("upsales", "Upsales"), ("cross-sell", "Cross-sell")], string="Sales Type 3")
     sales_type_revenue = fields.Char(string="Revenue Current/New")
-    x_studio_revenue_currentnew = fields.Char(string="Revenue Current/New")
-    x_studio_revenue_sales_type_1 = fields.Char(string="Revenue Sales Type 1")
-    x_studio_revenue_sales_type_2 = fields.Char(string="Revenue Sales Type 2")
-    x_studio_revenue_sales_type_3 = fields.Char(string="Revenue Sales Type 3")
     billing_month = fields.Selection([
         ("1", "January"),
         ("2", "February"),
@@ -55,10 +42,167 @@ class AccountMove(models.Model):
     track_all_fields = fields.Boolean(string="Track all fields", default=True)
     total_with_discount = fields.Float(string="Total with discount", compute="_compute_with_discount", store=True)
     sales_type_revenue_ids = fields.One2many(string="Sales type revenue", comodel_name="sales.type.revenue",
-                                             inverse_name="account_move_id", compute="_compute_sales_type_revenue_ids", store=True)
-    sales_type_departments_ids = fields.One2many(string="Sales type by departments", comodel_name="sales.type.departments",
-                                                 inverse_name="account_move_id", compute="_compute_sales_type_departments_ids",
+                                             inverse_name="account_move_id", compute="_compute_sales_type_revenue_ids",
+                                             store=True)
+    sales_type_departments_ids = fields.One2many(string="Sales type by departments",
+                                                 comodel_name="sales.type.departments",
+                                                 inverse_name="account_move_id",
+                                                 compute="_compute_sales_type_departments_ids",
                                                  store=True)
+    # fields to match with the studio module
+    x_studio_billing_month = fields.Selection(selection=[
+        ("January", "January"),
+        ("February", "February"),
+        ("March", "March"),
+        ("April", "April"),
+        ("May", "May"),
+        ("June", "June"),
+        ("July", "July"),
+        ("August", "August"),
+        ("September", "September"),
+        ("October", "October"),
+        ("November", "November"),
+        ("December", "December"),
+    ], string="Billing month")
+    x_studio_billing_year = fields.Selection(selection=[
+        ("2019", "2019"),
+        ("2020", "2020"),
+        ("2021", "2021"),
+        ("2022", "2022"),
+        ("2023", "2023"),
+        ("2024", "2024"),
+        ("2025", "2025"),
+    ], string="Billing year")
+    x_studio_customer_project = fields.Char(string="Customer project")
+    x_studio_project = fields.Char(string="Additional project")
+    x_studio_project_owner_bl = fields.Selection([
+        ("Dedicated Teams", "Dedicated Teams"),
+        ("Cloud Foundry", "Cloud Foundry"),
+        ("Protofire", "Protofire"),
+    ], string="Project owner BL")
+    x_studio_licence_ = fields.Char(string="Licence #")
+    x_studio_department_1_1 = fields.Selection(selection=[
+        (".NET Development", ".NET Development"),
+        ("Quality Assurance", "Quality Assurance"),
+        ("Front-end Development", "Front-end Development"),
+        ("Java Development", "Java Development"),
+        ("Mobile Development", "Mobile Development"),
+        ("Ruby Development", "Ruby Development"),
+        ("Argentina Labs", "Argentina Labs"),
+        ("CF Minsk", "CF Minsk"),
+        ("CF US", "CF US"),
+        ("Blockchain Start-ups", "Blockchain Start-ups"),
+        ("Insurance on Tokens", "Insurance on Tokens"),
+        ("EBC", "EBC"),
+        ("ML/Al", "ML/Al"),
+        ("IT Infrastructure", "IT Infrastructure"),
+        ("MLBL_Robot", "MLBL_Robot"),
+        ("MLBL_Camera", "MLBL_Camera"),
+        ("MLBL_Camera_Hardware", "MLBL_Camera_Hardware"),
+    ], string="Department 1")
+    x_studio_department_2 = fields.Selection(selection=[
+        (".NET Development", ".NET Development"),
+        ("Quality Assurance", "Quality Assurance"),
+        ("Front-end Development", "Front-end Development"),
+        ("Java Development", "Java Development"),
+        ("Mobile Development", "Mobile Development"),
+        ("Ruby Development", "Ruby Development"),
+        ("Argentina Labs", "Argentina Labs"),
+        ("CF Minsk", "CF Minsk"),
+        ("CF US", "CF US"),
+        ("Blockchain Start-ups", "Blockchain Start-ups"),
+        ("Insurance on Tokens", "Insurance on Tokens"),
+        ("EBC", "EBC"),
+        ("ML/Al", "ML/Al"),
+        ("IT Infrastructure", "IT Infrastructure"),
+        ("MLBL_Robot", "MLBL_Robot"),
+        ("MLBL_Camera", "MLBL_Camera"),
+        ("MLBL_Camera_Hardware", "MLBL_Camera_Hardware"),
+    ], string="Department 2")
+    x_studio_department_3 = fields.Selection(selection=[
+        (".NET Development", ".NET Development"),
+        ("Quality Assurance", "Quality Assurance"),
+        ("Front-end Development", "Front-end Development"),
+        ("Java Development", "Java Development"),
+        ("Mobile Development", "Mobile Development"),
+        ("Ruby Development", "Ruby Development"),
+        ("Argentina Labs", "Argentina Labs"),
+        ("CF Minsk", "CF Minsk"),
+        ("CF US", "CF US"),
+        ("Blockchain Start-ups", "Blockchain Start-ups"),
+        ("Insurance on Tokens", "Insurance on Tokens"),
+        ("EBC", "EBC"),
+        ("ML/Al", "ML/Al"),
+        ("IT Infrastructure", "IT Infrastructure"),
+        ("MLBL_Robot", "MLBL_Robot"),
+        ("MLBL_Camera", "MLBL_Camera"),
+        ("MLBL_Camera_Hardware", "MLBL_Camera_Hardware"),
+    ], string="Department 3")
+    x_studio_department_4 = fields.Selection(selection=[
+        (".NET Development", ".NET Development"),
+        ("Quality Assurance", "Quality Assurance"),
+        ("Front-end Development", "Front-end Development"),
+        ("Java Development", "Java Development"),
+        ("Mobile Development", "Mobile Development"),
+        ("Ruby Development", "Ruby Development"),
+        ("Argentina Labs", "Argentina Labs"),
+        ("CF Minsk", "CF Minsk"),
+        ("CF US", "CF US"),
+        ("Blockchain Start-ups", "Blockchain Start-ups"),
+        ("Insurance on Tokens", "Insurance on Tokens"),
+        ("EBC", "EBC"),
+        ("ML/Al", "ML/Al"),
+        ("IT Infrastructure", "IT Infrastructure"),
+        ("MLBL_Robot", "MLBL_Robot"),
+        ("MLBL_Camera", "MLBL_Camera"),
+        ("MLBL_Camera_Hardware", "MLBL_Camera_Hardware"),
+    ], string="Department 4")
+    x_studio_department_5 = fields.Selection(selection=[
+        (".NET Development", ".NET Development"),
+        ("Quality Assurance", "Quality Assurance"),
+        ("Front-end Development", "Front-end Development"),
+        ("Java Development", "Java Development"),
+        ("Mobile Development", "Mobile Development"),
+        ("Ruby Development", "Ruby Development"),
+        ("Argentina Labs", "Argentina Labs"),
+        ("CF Minsk", "CF Minsk"),
+        ("CF US", "CF US"),
+        ("Blockchain Start-ups", "Blockchain Start-ups"),
+        ("Insurance on Tokens", "Insurance on Tokens"),
+        ("EBC", "EBC"),
+        ("ML/Al", "ML/Al"),
+        ("IT Infrastructure", "IT Infrastructure"),
+        ("MLBL_Robot", "MLBL_Robot"),
+        ("MLBL_Camera", "MLBL_Camera"),
+        ("MLBL_Camera_Hardware", "MLBL_Camera_Hardware"),
+    ], string="Department 5")
+    x_studio_revenue_1 = fields.Char(string="Revenue 1")
+    x_studio_revenue_2 = fields.Char(string="Revenue 2")
+    x_studio_revenue_3 = fields.Char(string="Revenue 3")
+    x_studio_revenue_4 = fields.Char(string="Revenue 4")
+    x_studio_revenue_5 = fields.Char(string="Revenue 5")
+    x_studio_discount_1_1 = fields.Char(string="Discount 1")
+    x_studio_discount_2 = fields.Char(string="Discount 2")
+    x_studio_discount_3 = fields.Char(string="Discount 3")
+    x_studio_discount_4 = fields.Char(string="Discount 4")
+    x_studio_discount_5 = fields.Char(string="Discount 5")
+    x_studio_comment_1 = fields.Char(string="Comment 1")
+    x_studio_comment_2 = fields.Char(string="Comment 2")
+    x_studio_comment_3 = fields.Char(string="Comment 3")
+    x_studio_comment_4 = fields.Char(string="Comment 4")
+    x_studio_comment_5 = fields.Char(string="Comment 5")
+    x_studio_currentnew = fields.Selection(selection=[("Current", "Current"), ("New", "New")],
+                                           string="Current/New", default="Current")
+    x_studio_sales_type = fields.Selection(selection=[
+        ("base", "Base"), ("upsales", "Upsales"), ("cross-sell", "Cross-sell")], string="Sales Type 1")
+    x_studio_sales_type_2 = fields.Selection(selection=[
+        ("base", "Base"), ("upsales", "Upsales"), ("cross-sell", "Cross-sell")], string="Sales Type 2")
+    x_studio_sales_type_3_1 = fields.Selection(selection=[
+        ("base", "Base"), ("upsales", "Upsales"), ("cross-sell", "Cross-sell")], string="Sales Type 3")
+    x_studio_revenue_currentnew = fields.Char(string="Revenue Current/New")
+    x_studio_revenue_sales_type_1 = fields.Char(string="Revenue Sales Type 1")
+    x_studio_revenue_sales_type_2 = fields.Char(string="Revenue Sales Type 2")
+    x_studio_revenue_sales_type_3 = fields.Char(string="Revenue Sales Type 3")
 
     @api.depends("rate_employee_timesheet_ids")
     def _compute_sales_type_departments_ids(self):
