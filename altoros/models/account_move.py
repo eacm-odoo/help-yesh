@@ -63,7 +63,7 @@ class AccountMove(models.Model):
         ("October", "October"),
         ("November", "November"),
         ("December", "December"),
-    ], string="Billing month")
+    ], string="Billing month OLD")
     x_studio_billing_year = fields.Selection(selection=[
         ("2019", "2019"),
         ("2020", "2020"),
@@ -72,15 +72,15 @@ class AccountMove(models.Model):
         ("2023", "2023"),
         ("2024", "2024"),
         ("2025", "2025"),
-    ], string="Billing year")
-    x_studio_customer_project = fields.Char(string="Customer project")
-    x_studio_project = fields.Char(string="Additional project")
+    ], string="Billing year OLD")
+    x_studio_customer_project = fields.Char(string="Customer project OLD")
+    x_studio_project = fields.Char(string="Additional project OLD")
     x_studio_project_owner_bl = fields.Selection([
         ("Dedicated Teams", "Dedicated Teams"),
         ("Cloud Foundry", "Cloud Foundry"),
         ("Protofire", "Protofire"),
-    ], string="Project owner BL")
-    x_studio_licence_ = fields.Char(string="Licence #")
+    ], string="Project owner BL OLD")
+    x_studio_licence_ = fields.Char(string="Licence # OLD")
     x_studio_department_1_1 = fields.Selection(selection=[
         (".NET Development", ".NET Development"),
         ("Quality Assurance", "Quality Assurance"),
@@ -99,7 +99,7 @@ class AccountMove(models.Model):
         ("MLBL_Robot", "MLBL_Robot"),
         ("MLBL_Camera", "MLBL_Camera"),
         ("MLBL_Camera_Hardware", "MLBL_Camera_Hardware"),
-    ], string="Department 1")
+    ], string="Department 1 OLD")
     x_studio_department_2 = fields.Selection(selection=[
         (".NET Development", ".NET Development"),
         ("Quality Assurance", "Quality Assurance"),
@@ -118,7 +118,7 @@ class AccountMove(models.Model):
         ("MLBL_Robot", "MLBL_Robot"),
         ("MLBL_Camera", "MLBL_Camera"),
         ("MLBL_Camera_Hardware", "MLBL_Camera_Hardware"),
-    ], string="Department 2")
+    ], string="Department 2 OLD")
     x_studio_department_3 = fields.Selection(selection=[
         (".NET Development", ".NET Development"),
         ("Quality Assurance", "Quality Assurance"),
@@ -137,7 +137,7 @@ class AccountMove(models.Model):
         ("MLBL_Robot", "MLBL_Robot"),
         ("MLBL_Camera", "MLBL_Camera"),
         ("MLBL_Camera_Hardware", "MLBL_Camera_Hardware"),
-    ], string="Department 3")
+    ], string="Department 3 OLD")
     x_studio_department_4 = fields.Selection(selection=[
         (".NET Development", ".NET Development"),
         ("Quality Assurance", "Quality Assurance"),
@@ -156,7 +156,7 @@ class AccountMove(models.Model):
         ("MLBL_Robot", "MLBL_Robot"),
         ("MLBL_Camera", "MLBL_Camera"),
         ("MLBL_Camera_Hardware", "MLBL_Camera_Hardware"),
-    ], string="Department 4")
+    ], string="Department 4 OLD")
     x_studio_department_5 = fields.Selection(selection=[
         (".NET Development", ".NET Development"),
         ("Quality Assurance", "Quality Assurance"),
@@ -175,34 +175,36 @@ class AccountMove(models.Model):
         ("MLBL_Robot", "MLBL_Robot"),
         ("MLBL_Camera", "MLBL_Camera"),
         ("MLBL_Camera_Hardware", "MLBL_Camera_Hardware"),
-    ], string="Department 5")
-    x_studio_revenue_1 = fields.Char(string="Revenue 1")
-    x_studio_revenue_2 = fields.Char(string="Revenue 2")
-    x_studio_revenue_3 = fields.Char(string="Revenue 3")
-    x_studio_revenue_4 = fields.Char(string="Revenue 4")
-    x_studio_revenue_5 = fields.Char(string="Revenue 5")
-    x_studio_discount_1_1 = fields.Char(string="Discount 1")
-    x_studio_discount_2 = fields.Char(string="Discount 2")
-    x_studio_discount_3 = fields.Char(string="Discount 3")
-    x_studio_discount_4 = fields.Char(string="Discount 4")
-    x_studio_discount_5 = fields.Char(string="Discount 5")
-    x_studio_comment_1 = fields.Char(string="Comment 1")
-    x_studio_comment_2 = fields.Char(string="Comment 2")
-    x_studio_comment_3 = fields.Char(string="Comment 3")
-    x_studio_comment_4 = fields.Char(string="Comment 4")
-    x_studio_comment_5 = fields.Char(string="Comment 5")
+    ], string="Department 5 OLD")
+    x_studio_revenue_1 = fields.Char(string="Revenue 1 OLD")
+    x_studio_revenue_2 = fields.Char(string="Revenue 2 OLD")
+    x_studio_revenue_3 = fields.Char(string="Revenue 3 OLD")
+    x_studio_revenue_4 = fields.Char(string="Revenue 4 OLD")
+    x_studio_revenue_5 = fields.Char(string="Revenue 5 OLD")
+    x_studio_discount_1_1 = fields.Char(string="Discount 1 OLD")
+    x_studio_discount_2 = fields.Char(string="Discount 2 OLD")
+    x_studio_discount_3 = fields.Char(string="Discount 3 OLD")
+    x_studio_discount_4 = fields.Char(string="Discount 4 OLD")
+    x_studio_discount_5 = fields.Char(string="Discount 5 OLD")
+    x_studio_comment_1 = fields.Char(string="Comment 1 OLD")
+    x_studio_comment_2 = fields.Char(string="Comment 2 OLD")
+    x_studio_comment_3 = fields.Char(string="Comment 3 OLD")
+    x_studio_comment_4 = fields.Char(string="Comment 4 OLD")
+    x_studio_comment_5 = fields.Char(string="Comment 5 OLD")
     x_studio_currentnew = fields.Selection(selection=[("Current", "Current"), ("New", "New")],
-                                           string="Current/New", default="Current")
+                                           string="Current/New OLD", default="Current")
     x_studio_sales_type = fields.Selection(selection=[
-        ("base", "Base"), ("upsales", "Upsales"), ("cross-sell", "Cross-sell")], string="Sales Type 1")
+        ("Base", "Base"), ("Upsales", "Upsales"), ("Cross-sell", "Cross-sell")], string="Sales Type 1 OLD")
     x_studio_sales_type_2 = fields.Selection(selection=[
-        ("base", "Base"), ("upsales", "Upsales"), ("cross-sell", "Cross-sell")], string="Sales Type 2")
+        ("Base", "Base"), ("Upsales", "Upsales"), ("Cross-sell", "Cross-sell")], string="Sales Type 2 OLD")
     x_studio_sales_type_3_1 = fields.Selection(selection=[
-        ("base", "Base"), ("upsales", "Upsales"), ("cross-sell", "Cross-sell")], string="Sales Type 3")
-    x_studio_revenue_currentnew = fields.Char(string="Revenue Current/New")
-    x_studio_revenue_sales_type_1 = fields.Char(string="Revenue Sales Type 1")
-    x_studio_revenue_sales_type_2 = fields.Char(string="Revenue Sales Type 2")
-    x_studio_revenue_sales_type_3 = fields.Char(string="Revenue Sales Type 3")
+        ("Base", "Base"), ("Upsales", "Upsales"), ("Cross-sell", "Cross-sell")], string="Sales Type 3 OLD")
+    x_studio_revenue_currentnew = fields.Char(string="Revenue Current/New OLD")
+    x_studio_revenue_sales_type_1 = fields.Char(string="Revenue Sales Type 1 OLD")
+    x_studio_revenue_sales_type_2 = fields.Char(string="Revenue Sales Type 2 OLD")
+    x_studio_revenue_sales_type_3 = fields.Char(string="Revenue Sales Type 3 OLD")
+    x_studio_currency = fields.Char(string="Currency OLD")
+    x_studio_company_currency = fields.Char(string="Company currency OLD")
 
     @api.depends("rate_employee_timesheet_ids")
     def _compute_sales_type_departments_ids(self):

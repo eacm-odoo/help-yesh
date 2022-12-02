@@ -103,6 +103,8 @@
                             <field name="x_studio_project"/>
                             <field name="x_studio_project_owner_bl"/>
                             <field name="x_studio_licence_"/>
+                            <field name="x_studio_currency"/>
+                            <field name="x_studio_company_currency"/>
                         </group>
                         <group>
                             <group string="Departments">
