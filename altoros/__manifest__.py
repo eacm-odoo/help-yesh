@@ -26,6 +26,8 @@
         "views/project_project_views.xml",
         "views/account_account_views.xml",
         "views/res_partner_views.xml",
+        "views/project_task_views.xml",
+        "views/sale_order_views.xml",
         # wizard
         "wizard/timesheet_filling_views.xml",
         "wizard/invoices_changes_wizard_views.xml",

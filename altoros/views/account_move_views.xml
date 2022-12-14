@@ -161,5 +161,22 @@
                 </xpath>
             </field>
         </record>
+
+        <record id="account_move_tree" model="ir.ui.view">
+            <field name="name">account.move.inherit.tree</field>
+            <field name="model">account.move</field>
+            <field name="inherit_id" ref="account.view_invoice_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='company_id']" position="after">
+                    <field name="x_studio_currency" optional="show"/>
+                    <field name="x_studio_company_currency" optional="show"/>
+                    <field name="currency_id" optional="show"/>
+                </xpath>
+                <xpath expr="//field[@name='amount_total_signed']" position="after">
+                    <field name="amount_total" string="Amount total" optional="show"/>
+                </xpath>
+            </field>
+        </record>
+
     </data>
 </odoo>

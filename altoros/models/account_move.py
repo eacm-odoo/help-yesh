@@ -303,6 +303,7 @@ class AccountMove(models.Model):
                                          "name": self.create_line_name(),
                                          "price_unit": price_unit,
                                          })]
+        self.department_rate_ids._set_total_value_hours_dpt()
 
     def check_for_or_create_record(self, model_name, search_domain, **kwargs):
         """Checking for or creating a model record."""
