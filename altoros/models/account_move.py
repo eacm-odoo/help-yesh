@@ -355,6 +355,8 @@ class AccountMove(models.Model):
         """Check sales_type and sales_type_revenue fields"""
         res = super(AccountMove, self).action_post()
         for move in self:
+            if not move.project_owner:
+                raise UserError(_("Project Owner BL must be selected. Go to the Project and select it."))
             if not move.sales_type or not move.sales_type_revenue:
                 raise UserError(_("Please fill in the fields Current/New and Revenue Current/New"))
         return res
