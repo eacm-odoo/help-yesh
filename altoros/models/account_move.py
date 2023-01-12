@@ -294,15 +294,22 @@ class AccountMove(models.Model):
         price_unit = self.total_price
         if not self.env.context.get("is_tomesheets_context"):
             price_unit = self.total_with_discount
+        vals_dct = {"product_id": product_id,
+                    "move_id": self.id,
+                    "account_id": account_id,
+                    "quantity": 1,
+                    "name": self.create_line_name(),
+                    "price_unit": price_unit,
+                    }
         if self.invoice_line_ids:
-            self.invoice_line_ids = [(5, 0, 0)]
-        self.invoice_line_ids = [(0, 0, {"product_id": product_id,
-                                         "move_id": self.id,
-                                         "account_id": account_id,
-                                         "quantity": 1,
-                                         "name": self.create_line_name(),
-                                         "price_unit": price_unit,
-                                         })]
+            min_sequence = min(self.invoice_line_ids.mapped("sequence"))
+            vals_dct["sequence"] = min_sequence
+            min_sequence_line_ids = self.invoice_line_ids.filtered(lambda rec: rec.sequence == min_sequence)
+            self.invoice_line_ids = [(2, min_sequence_line_ids[0].id)]
+            if len(min_sequence_line_ids) > 1:
+                for invoice_line_id in self.invoice_line_ids:
+                    invoice_line_id.sequence = invoice_line_id.sequence + 1
+        self.invoice_line_ids = [(0, 0, vals_dct)]
         self.department_rate_ids._set_total_value_hours_dpt()
 
     def check_for_or_create_record(self, model_name, search_domain, **kwargs):
