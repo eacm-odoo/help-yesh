@@ -1,0 +1,29 @@
+<odoo>
+
+    <record id="generate_cash_flow_analytics_form_view" model="ir.ui.view">
+        <field name="name">generate.cash.flow.analytics.form.view</field>
+        <field name="model">generate.cash.flow.analytics</field>
+        <field name="arch" type="xml">
+            <form string="Generate cash flow analitics">
+                 <group>
+                    <field name="start_date"/>
+                    <field name="end_date"/>
+                 </group>
+                <footer>
+                    <button name="generate_cash_flow_analytics" string="Generate" type="object"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <act_window name="Generate Cash Flow Analitics"
+        id="action_generate_cash_flow_analytics_form_view"
+        res_model="generate.cash.flow.analytics"
+        binding_model="generate.cash.flow.analytics"
+        binding_views="form"
+        view_mode="form"
+        target="new"
+    />
+
+</odoo>

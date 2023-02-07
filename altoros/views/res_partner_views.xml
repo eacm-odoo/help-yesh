@@ -10,6 +10,9 @@
                         <button class="oe_stat_button" type="object" name="return_related_project"
                         icon="fa-list-alt" string="Projects"/>
                     </xpath>
+                     <xpath expr="//field[@name='property_payment_term_id']" position="after">
+                        <field name="account_payment_term"/>
+                    </xpath>
                 </field>
             </record>
         </data>

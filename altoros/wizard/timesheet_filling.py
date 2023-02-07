@@ -62,9 +62,11 @@ class TimesheetFilling(models.TransientModel):
              "billing_month": self.select_billing_month,
              "billing_year": self.start_date.year,
              "invoice_payment_term_id": self.project_id.partner_id.property_payment_term_id,
+             "partner_id":  self.project_id.partner_id.id,
              "rate_employee_timesheet_ids": result})
         invoice_id.rate_employee_timesheet_ids._onchange_unit_amount_rate()
         invoice_id.onchange_rate_employee_timesheet_ids()
+        invoice_id._onchange_partner_id()
         return {
             "view_mode": "form",
             "res_model": "account.move",

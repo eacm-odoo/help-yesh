@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<templates id="template" xml:space="preserve">
+
+    <t t-extend="ListView.buttons">
+        <t t-jquery="button.o_list_export_xlsx" t-operation="before">
+             <t t-if="widget.modelName=='cash.flow.analytics'">
+                <button type="button" class="btn btn-secondary cash_flow_analytics">
+                   Generate
+                </button>
+                 <button type="button" class="btn btn-secondary edit_opening_balance">
+                   Edit opening balance
+                </button>
+             </t>
+        </t>
+    </t>
+
+</templates>
+

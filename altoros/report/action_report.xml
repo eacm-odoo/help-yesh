@@ -25,6 +25,16 @@
         />
 
         <report
+            id="invoice_timesheets_report_xlsx"
+            model="account.move"
+            string="Timesheets Report"
+            report_type="xlsx"
+            name="altoros.invoice_timesheets_report_xlsx"
+            file="invoice_timesheets_report_xlsx"
+            attachment_use="False"
+        />
+
+        <report
             id="timesheets_to_approve_report_xlsx"
             model="project.task"
             string="Timesheets to approve"

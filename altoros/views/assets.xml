@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="stock_picking_move" inherit_id="web.assets_backend">
+        <xpath expr="." position="inside">
+            <script src="/altoros/static/src/js/cash_flow_analytics.js" type="text/javascript"/>
+            <script src="/altoros/static/src/js/edit_opening_balance.js" type="text/javascript"/>
+        </xpath>
+    </template>
+
+</odoo>

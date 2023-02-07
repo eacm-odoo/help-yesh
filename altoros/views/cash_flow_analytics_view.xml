@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="cash_flow_analytics_action" model="ir.actions.act_window">
+        <field name="name">Cash flow analytics</field>
+        <field name="res_model">cash.flow.analytics</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="context">{'search_default_journal_id': True,}</field>
+        <field name="view_mode">tree,pivot</field>
+    </record>
+
+    <record id="cash_flow_analytics_view_tree" model="ir.ui.view">
+        <field name="name">cash.flow.analytics.tree</field>
+        <field name="model">cash.flow.analytics</field>
+        <field name="arch" type="xml">
+            <tree create="1" edit="1">
+                <field name="date"/>
+                <field name="account_journal_id"/>
+                <field name="res_company_id"/>
+                <field name="opening_balance"/>
+                <field name="customer_id"/>
+                <field name="customer_amount"/>
+                <field name="vendor_id"/>
+                <field name="vendor_amount"/>
+                <field name="intercompany_in_id"/>
+                <field name="intercompany_in_amount"/>
+                <field name="intercompany_out_id"/>
+                <field name="intercompany_out_amount"/>
+                <field name="closing_balance"/>
+            </tree>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="cash_flow_analytics_view_pivot">
+        <field name="name">cash.flow.analytics.pivot</field>
+        <field name="model">cash.flow.analytics</field>
+        <field name="arch" type="xml">
+            <pivot string="Cash flow analytics">
+                <field name="date"  interval="day" type="col"/>
+                <field name="opening_balance"  type="measure"/>
+                <field name="customer_amount" type="measure"/>
+                <field name="vendor_amount" type="measure"/>
+                <field name="intercompany_in_amount" type="measure"/>
+                <field name="intercompany_out_amount" type="measure"/>
+                <field name="closing_balance"  type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="view_cash_flow_analytics_filter" model="ir.ui.view">
+            <field name="name">cash.flow.analytics.search</field>
+            <field name="model">cash.flow.analytics</field>
+            <field name="arch" type="xml">
+                <search string="Cash flow analytics">
+                    <group expand="0" string="Group By">
+                        <filter string="Company" name="res_company_id" domain="[]" context="{'group_by': 'res_company_id'}"/>
+                        <filter string="Bank" name="journal_id" domain="[]" context="{'group_by': 'account_journal_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+    <menuitem action="cash_flow_analytics_action" id="cash_flow_analytics_menu"
+              parent="account.menu_finance_reports" sequence="11" name="Cash Flow Analytics"/>
+
+</odoo>

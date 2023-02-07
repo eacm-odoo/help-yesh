@@ -1,8 +1,10 @@
-from odoo import models, _
-
+from odoo import fields, models
+from odoo.tools.translate import _
 
 class ResPartner(models.Model):
     _inherit = "res.partner"
+
+    account_payment_term = fields.Integer(string="Actual payment terms, days")
 
     def return_related_project(self):
         """Return all related projects for res_partner"""

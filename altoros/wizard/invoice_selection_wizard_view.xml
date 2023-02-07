@@ -1,0 +1,32 @@
+<odoo>
+    <record id="invoice_selection_wizard_form_view" model="ir.ui.view">
+        <field name="name">invoice.selection.wizard.form.view</field>
+        <field name="model">invoice.selection.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Invoices Changes">
+                 <group>
+                    <field name="start_date"/>
+                    <field name="end_date"/>
+                 </group>
+                <footer>
+                    <button name="create_report" string="Create" type="object"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <act_window name="Timesheets Report"
+        id="action_invoice_selection_wizard_form_view"
+        res_model="invoice.selection.wizard"
+        binding_model="invoice.selection.wizard"
+        binding_views="form"
+        view_mode="form"
+        target="new"
+    />
+
+    <menuitem id="invoice_selection_menu"
+      action="action_invoice_selection_wizard_form_view"
+      parent="account.menu_finance_reports"
+      sequence="10"/>
+</odoo>

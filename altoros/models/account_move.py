@@ -1,4 +1,5 @@
 from datetime import date
+from datetime import timedelta
 
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
@@ -37,8 +38,6 @@ class AccountMove(models.Model):
     billing_year = fields.Char(string="Billing year")
     project_owner = fields.Selection(string="Project Owner BL", related="project_id.project_owner")
     invoice_date = fields.Date(string="Invoice/Bill Date", default=fields.Date.today)
-    partner_id = fields.Many2one(comodel_name="res.partner", store=True, tracking=True,
-                                 related="project_id.partner_id", string="Partner", ondelete="restrict")
     track_all_fields = fields.Boolean(string="Track all fields", default=True)
     total_with_discount = fields.Float(string="Total with discount", compute="_compute_with_discount", store=True)
     sales_type_revenue_ids = fields.One2many(string="Sales type revenue", comodel_name="sales.type.revenue",
@@ -205,6 +204,20 @@ class AccountMove(models.Model):
     x_studio_revenue_sales_type_3 = fields.Char(string="Revenue Sales Type 3 OLD")
     x_studio_currency = fields.Char(string="Currency OLD")
     x_studio_company_currency = fields.Char(string="Company currency OLD")
+    actual_due_date = fields.Date(compute="_compute_actual_due_date", string="Actual Due Date", store=True)
+
+    @api.onchange("project_id")
+    def onchange_project_id(self):
+        """Change partner_id according project_id"""
+        self.partner_id = self.project_id.partner_id.id
+
+    @api.depends("invoice_date", "partner_id", "partner_id.account_payment_term")
+    def _compute_actual_due_date(self):
+        """Compute actual_due_date field according invoice_date and account_payment_term"""
+        for rec in self:
+            payment_term = rec.partner_id.account_payment_term if rec.partner_id else False
+            rec.actual_due_date = rec.invoice_date + timedelta(
+                days=payment_term) if payment_term else rec.invoice_date_due
 
     @api.depends("rate_employee_timesheet_ids")
     def _compute_sales_type_departments_ids(self):

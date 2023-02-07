@@ -1,0 +1,30 @@
+<odoo>
+
+    <record id="edit_opening_balance_form_view" model="ir.ui.view">
+        <field name="name">edit.opening.balance.form.view</field>
+        <field name="model">edit.opening.balance</field>
+        <field name="arch" type="xml">
+            <form string="Edit opening balance">
+                 <group>
+                    <field name="date"/>
+                    <field name="journal_id"/>
+                    <field name="balance"/>
+                 </group>
+                <footer>
+                    <button name="recalculate_opening_balance" string="Confirm" type="object"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <act_window name="Edit opening balance"
+        id="action_edit_opening_balance_form_view"
+        res_model="edit.opening.balance"
+        binding_model="edit.opening.balance"
+        binding_views="form"
+        view_mode="form"
+        target="new"
+    />
+
+</odoo>
