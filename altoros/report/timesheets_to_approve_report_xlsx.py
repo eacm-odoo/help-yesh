@@ -1,4 +1,5 @@
 import logging
+import re
 from datetime import datetime
 from datetime import timedelta
 
@@ -32,8 +33,8 @@ class TimesheetsToApproveReportXlsx(models.AbstractModel):
 
                         data_to_report_grouped_by_project[project_task_id.project_id][timesheet_id.employee_id][(timesheet_id.date, timesheet_id.task_id)] += timesheet_id.unit_amount
 
-
-            for project_id, project_data in data_to_report_grouped_by_project.items():
+            sorted_data_to_report = dict(sorted(data_to_report_grouped_by_project.items(), key=lambda item: int(re.match(r'\d+', item[0].name).group())))
+            for project_id, project_data in sorted_data_to_report.items():
                 sheet = workbook.add_worksheet(project_id.name)
                 header_format = workbook.add_format(
                     {"align": "left", "font_size": 14, "bold": True, "font_name": "Arial", "underline": True,
@@ -71,12 +72,29 @@ class TimesheetsToApproveReportXlsx(models.AbstractModel):
                 table_total_format_align_right = workbook.add_format(
                     {"align": "right", "valign": "vcenter", "border": 1, "bold": True, "font_name": "Arial",
                      "text_wrap": False, "fg_color": "#87CEEB", "font_size": 10, "num_format": "0.00"})
+                not_approved_format = workbook.add_format(
+                    {"align": "center", "valign": "vcenter", "border": 1, "bold": True, "font_name": "Arial",
+                     "text_wrap": False, "bg_color": "#F5A9A9", "font_size": 10})
+                approved_format = workbook.add_format(
+                    {"align": "center", "valign": "vcenter", "border": 1, "bold": True, "font_name": "Arial",
+                     "text_wrap": False, "bg_color": "#74B998", "font_size": 10})
 
                 sheet.set_column(1, 2, 18)
                 sheet.set_column(3, 3, 24)
                 sheet.set_column(4, 9, 18)
 
                 sheet.merge_range(1, 1, 1, 2, report_name, header_format)
+
+                sheet.write("G2", "Not approved")
+                sheet.conditional_format("G2", {"type": "text",
+                                                "criteria": "begins with",
+                                                "value": "Approved",
+                                                "format": approved_format})
+                sheet.conditional_format("G2", {"type": "text",
+                                                "criteria": "begins with",
+                                                "value": "Not",
+                                                "format": not_approved_format})
+                sheet.data_validation("G2", {"validate": "list", "source": ["Not Approved", "Approved"]})
 
                 sheet.merge_range(3, 1, 3, 2, "Prepared by:", table_top_left_format)
                 sheet.merge_range(3, 3, 3, 4, self.env.user.name, table_top_right_format)
@@ -100,6 +118,7 @@ class TimesheetsToApproveReportXlsx(models.AbstractModel):
                 header_employee = False
                 total_billable_for_project = 0
                 for employee_id, timesheet_data in project_data.items():
+                    timesheet_data = dict(sorted(timesheet_data.items(), key=lambda item: item[0][0]))
                     sum_of_total_hours, total_billable = 0, 0
                     for (date, task_id), total_hours in timesheet_data.items():
                         if employee_id != header_employee:

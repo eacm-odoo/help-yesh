@@ -79,7 +79,7 @@ class ProjectReportXlsx(models.AbstractModel):
                 for employee_id in unique_employee_ids:
                     timesheet_ids = invoice_id.rate_employee_timesheet_ids.search(
                         [("employee_id", "=", employee_id.id), ("account_move_id", "=", invoice_id.id)])
-                    for timesheet_id in timesheet_ids:
+                    for timesheet_id in timesheet_ids.sorted("date"):
                         if timesheet_id.id == timesheet_ids[:1].id:
                             sheet.write(row, 1, timesheet_id.employee_id.name, table_format)
                         else:

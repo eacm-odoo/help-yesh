@@ -206,6 +206,10 @@ class AccountMove(models.Model):
     x_studio_company_currency = fields.Char(string="Company currency OLD")
     actual_due_date = fields.Date(compute="_compute_actual_due_date", string="Actual Due Date", store=True)
 
+    def get_report_base_filename(self):
+        """Get report filename"""
+        return f"timesheets_report_{', '.join(self.mapped('name'))}"
+
     @api.onchange("project_id")
     def onchange_project_id(self):
         """Change partner_id according project_id"""
@@ -217,7 +221,7 @@ class AccountMove(models.Model):
         for rec in self:
             payment_term = rec.partner_id.account_payment_term if rec.partner_id else False
             rec.actual_due_date = rec.invoice_date + timedelta(
-                days=payment_term) if payment_term else rec.invoice_date_due
+                days=payment_term) if payment_term and rec.invoice_date else rec.invoice_date_due
 
     @api.depends("rate_employee_timesheet_ids")
     def _compute_sales_type_departments_ids(self):

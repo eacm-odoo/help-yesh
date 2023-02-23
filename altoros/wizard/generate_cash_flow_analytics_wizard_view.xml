@@ -8,6 +8,9 @@
                  <group>
                     <field name="start_date"/>
                     <field name="end_date"/>
+                    <field name="forecast_type" widget="radio"/>
+                    <field name="analysis_period" attrs="{'invisible': [('forecast_type','=', 'real')]}"/>
+                    <field name="number_recent_payment" attrs="{'invisible': [('forecast_type','=', 'real')]}"/>
                  </group>
                 <footer>
                     <button name="generate_cash_flow_analytics" string="Generate" type="object"/>

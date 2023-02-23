@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <data noupdate="1">
+    <data>
 
         <record id="project_report_xls_action" model="ir.actions.report">
             <field name="name">Project Report</field>
@@ -23,15 +23,14 @@
             file="invoices_changes_report_xlsx"
             attachment_use="False"
         />
-
         <report
-            id="invoice_timesheets_report_xlsx"
+            id="report_invoice_timesheets_xlsx"
             model="account.move"
-            string="Timesheets Report"
+            string="Timesheets report"
             report_type="xlsx"
             name="altoros.invoice_timesheets_report_xlsx"
-            file="invoice_timesheets_report_xlsx"
-            attachment_use="False"
+            file="timesheets_report"
+            print_report_name="(object.get_report_base_filename())"
         />
 
         <report

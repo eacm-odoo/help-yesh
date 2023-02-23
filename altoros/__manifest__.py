@@ -1,7 +1,6 @@
 {
     "name": "Altoros",
     "summary": "Altoros module",
-    "version": "1.0.1",
     "description": """ Altoros module """,
     "depends": [
         "base",
@@ -42,6 +41,7 @@
         "data/product_product_data.xml",
         # report
         "report/action_report.xml",
+        "report/invoice_order_report.xml",
 
     ],
     'qweb': [

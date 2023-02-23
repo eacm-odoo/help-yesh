@@ -1,0 +1,27 @@
+.o_pivot {
+    overflow: auto;
+
+    table {
+
+        thead tr:first-child th:first-child{
+            position: sticky;
+        }
+
+        thead tr th:not(.o_pivot_header_cell_closed):not(.o_pivot_header_cell_opened):not(.o_pivot_header_cell):not(.o_pivot_measure_row) {
+            width: 400px;
+            min-width: 400px;
+            max-width: 400px;
+            left: 0px;
+        }
+
+        tbody tr th {
+            width: 400px;
+            min-width: 400px;
+            max-width: 400px;
+            left: 0px;
+            position: absolute;
+        }
+
+    }
+}
+

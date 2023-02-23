@@ -19,4 +19,4 @@ class InvoicesChangesWizard(models.TransientModel):
             "start_date": self.start_date,
             "end_date": self.end_date,
         }
-        return self.env.ref("altoros.invoice_timesheets_report_xlsx").report_action(invoice_ids, dates_to_report)
+        return self.env.ref("altoros.report_invoice_timesheets_xlsx").report_action(invoice_ids, dates_to_report)

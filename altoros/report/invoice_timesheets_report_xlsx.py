@@ -58,14 +58,14 @@ class InvoicesChangesReportXlsx(models.AbstractModel):
             sheet = workbook.add_worksheet(report_name)
             sheet.set_column(1, 11, 15)
             sheet.merge_range(1, 1, 1, 3, "Timesheet Report", header_format)
-            sheet.merge_range(3, 1, 3, 2, "Prepared by:", table_top_left_format)
+            sheet.merge_range(3, 1, 3, 2, "Invoice:", table_top_left_format)
             sheet.merge_range(4, 1, 4, 2, "Date:", table_top_left_side_format)
             sheet.merge_range(5, 1, 5, 2, "Reporting period:", table_footer_left_side_format)
-            sheet.merge_range(3, 3, 3, 4, self.env.user.name, table_top_right_format)
-            sheet.merge_range(4, 3, 4, 4, date.today().strftime('%d-%m-%Y'), table_top_right_side_format)
+            sheet.merge_range(3, 3, 3, 6, ", ".join(invoice_ids.mapped("name")), table_top_right_format)
+            sheet.merge_range(4, 3, 4, 6, date.today().strftime('%d-%m-%Y'), table_top_right_side_format)
             start_date = data.get("start_date") if data.get("start_date") else invoice_ids[:1].invoice_date.strftime('%d/%m/%Y')
             end_date = data.get("end_date") if data.get("end_date") else invoice_ids[:1].invoice_date.strftime('%d/%m/%Y')
-            sheet.merge_range(5, 3, 5, 4, "from {} to {}".format(start_date, end_date), table_footer_right_side_format)
+            sheet.merge_range(5, 3, 5, 6, "from {} to {}".format(start_date, end_date), table_footer_right_side_format)
             sheet.write(8, 1, "Invoice", table_header_format)
             sheet.write(8, 2, "Project", table_header_format)
             sheet.write(8, 3, "Developer", table_header_format)
@@ -79,7 +79,7 @@ class InvoicesChangesReportXlsx(models.AbstractModel):
             sheet.write(8, 11, "Comment", table_header_format)
             row = 9
             for invoice_id in invoice_ids:
-                for timesheet_id in invoice_id.rate_employee_timesheet_ids:
+                for timesheet_id in invoice_id.rate_employee_timesheet_ids.sorted("date"):
                     sheet.write(row, 1, invoice_id.name, table_format)
                     sheet.write(row, 2, invoice_id.project_id.name if invoice_id.project_id else "Not Set", table_format)
                     sheet.write(row, 3, timesheet_id.employee_id.name if timesheet_id.employee_id else "Not Set", table_format)
