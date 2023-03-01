@@ -56,16 +56,16 @@ class ProjectReportXlsx(models.AbstractModel):
                 sheet.set_column(1, 8, 15)
 
                 sheet.merge_range(1, 1, 1, 3, "Project Report", header_format)
-                sheet.merge_range(3, 1, 3, 2, "Prepared by:", table_top_left_format)
+                sheet.merge_range(3, 1, 3, 2, "Invoice:", table_top_left_format)
                 sheet.merge_range(4, 1, 4, 2, "Date:", table_top_left_side_format)
                 sheet.merge_range(5, 1, 5, 2, "Project:", table_top_left_side_format)
                 sheet.merge_range(6, 1, 6, 2, "Reporting period:", table_footer_left_side_format)
-                sheet.merge_range(3, 3, 3, 4, invoice_id.env.user.name, table_top_right_format)
-                sheet.merge_range(4, 3, 4, 4, date.today().strftime('%d-%m-%Y'), table_top_right_side_format)
+                sheet.merge_range(3, 3, 3, 4, invoice_id.name, table_top_right_format)
+                sheet.merge_range(4, 3, 4, 4, date.today().strftime("%d-%m-%Y"), table_top_right_side_format)
                 sheet.merge_range(5, 3, 5, 4, invoice_id.project_id.name, table_top_right_side_format)
-                sheet.merge_range(6, 3, 6, 4, "{}-{}".format(invoice_id.start_date.strftime('%d/%m/%Y'),
-                                                             invoice_id.end_date.strftime('%d/%m/%Y')),
-                                  table_footer_right_side_format)
+                start_date = invoice_id.start_date.strftime("%d/%m/%Y") if invoice_id.start_date else ""
+                end_date = invoice_id.end_date.strftime("%d/%m/%Y") if invoice_id.end_date else ""
+                sheet.merge_range(6, 3, 6, 4, "{}-{}".format(start_date, end_date), table_footer_right_side_format)
                 sheet.write(8, 1, "Developer", table_header_format)
                 sheet.write(8, 2, "Date", table_header_format)
                 sheet.write(8, 3, "Task", table_header_format)
@@ -78,8 +78,8 @@ class ProjectReportXlsx(models.AbstractModel):
                 unique_employee_ids = set(invoice_id.rate_employee_timesheet_ids.mapped("employee_id"))
                 for employee_id in unique_employee_ids:
                     timesheet_ids = invoice_id.rate_employee_timesheet_ids.search(
-                        [("employee_id", "=", employee_id.id), ("account_move_id", "=", invoice_id.id)])
-                    for timesheet_id in timesheet_ids.sorted("date"):
+                        [("employee_id", "=", employee_id.id), ("account_move_id", "=", invoice_id.id)]).sorted("date")
+                    for timesheet_id in timesheet_ids:
                         if timesheet_id.id == timesheet_ids[:1].id:
                             sheet.write(row, 1, timesheet_id.employee_id.name, table_format)
                         else:

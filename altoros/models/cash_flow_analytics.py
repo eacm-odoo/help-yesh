@@ -26,6 +26,7 @@ class CashFlowAnalytics(models.Model):
     def generate_real_cash_flow_analitics(self, start_date, end_date):
         """Generate instances of cash.flow.analytics model for real period and set amount, opening and close balance"""
         self.env["cash.flow.analytics"].search([]).unlink()
+        last_date = end_date
         account_payment_ids = self.env["account.payment"].search(
             [("payment_type", "!=", "transfer"), ("state", "not in", ["draft", "cancelled"]),
              ("payment_date", "<", fields.Date.today()), ("payment_date", ">=", start_date)]).sorted("payment_date")
@@ -46,7 +47,7 @@ class CashFlowAnalytics(models.Model):
                 "intercompany_out_amount": outbound_amount if cash_flow_analytics_id.intercompany_out_id else 0,
             })
             closing_balance = self.change_closing_balance(cash_flow_analytics_id)
-        last_date = account_payment_ids[-1].payment_date if account_payment_ids else False
+            last_date = account_payment_id.payment_date
         account_move_ids = self.env["account.move"].search(
             [("invoice_payment_state", "=", "not_paid"), ("state", "=", "posted"),
              ("actual_due_date", ">=", fields.Date.today()), ("actual_due_date", "<=", end_date)]).sorted(
@@ -66,7 +67,7 @@ class CashFlowAnalytics(models.Model):
                 "intercompany_out_amount": -amount if cash_flow_analytics_id.intercompany_out_id else 0,
             })
             closing_balance = self.change_closing_balance(cash_flow_analytics_id)
-        last_date = account_move_ids[-1].actual_due_date if account_move_ids else end_date
+            last_date = account_move_id.actual_due_date
         return last_date, closing_balance
 
     def _create_real_cash_flow_analytics(self, account_data_id, type, closing_balance, date):
@@ -179,7 +180,8 @@ class CashFlowAnalytics(models.Model):
     def get_date_range(partner, payment_term, cash_flow_ids):
         """Calculate date_range for cash_flow_analytics model"""
         if partner in ["customer_id", "vendor_id"] and payment_term:
-            date_range = timedelta(payment_term)
+            date_range = timedelta(days=payment_term)
         else:
-            date_range = cash_flow_ids[1].date - cash_flow_ids[0].date
+            date_time = cash_flow_ids[1].date - cash_flow_ids[0].date
+            date_range = date_time if date_time < timedelta(days=1) else timedelta(days=1)
         return date_range
