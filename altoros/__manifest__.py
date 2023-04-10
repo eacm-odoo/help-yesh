@@ -2,6 +2,7 @@
     "name": "Altoros",
     "summary": "Altoros module",
     "description": """ Altoros module """,
+    "version": "15.0.1",
     "depends": [
         "base",
         "hr",
