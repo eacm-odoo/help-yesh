@@ -11,6 +11,7 @@
                 </xpath>
                  <xpath expr="//field[@name='ref']" position="after">
                     <field name="actual_due_date" invisible="1"/>
+                    <field name="deviation" invisible="1"/>
                 </xpath>
                 <xpath expr="//page[@name='other_info']" position="after">
                     <page name="timesheets" string="Timesheets">
@@ -180,9 +181,45 @@
                 </xpath>
                  <xpath expr="//field[@name='invoice_date_due']" position="after">
                     <field name="actual_due_date" optional="show"/>
+                    <field name="deviation" optional="hide"/>
                 </xpath>
             </field>
         </record>
+
+        <record model="ir.ui.view" id="account_move_view_pivot">
+            <field name="name">account.move.pivot</field>
+            <field name="model">account.move</field>
+            <field name="arch" type="xml">
+                <pivot string="Account move">
+                    <field name="invoice_date"  interval="month" type="col"/>
+                    <field name="deviation" type="measure"/>
+                </pivot>
+            </field>
+        </record>
+
+        <record id="view_account_move_inherit" model="ir.ui.view">
+            <field name="name">account.move.search.inherit</field>
+            <field name="model">account.move</field>
+            <field name="inherit_id" ref="account.view_account_invoice_filter"/>
+            <field name="arch" type="xml">
+                 <xpath expr="//search" position="inside">
+                    <filter string="Partner" name="partner" domain="[]" context="{'group_by': 'partner_id'}"/>
+                    <filter string="Project owner" name="project_owner" domain="[]" context="{'group_by': 'project_owner'}"/>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="account_move_deviation_action" model="ir.actions.act_window">
+            <field name="name">Deviation</field>
+            <field name="res_model">account.move</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="domain">[('type', '=', 'out_invoice'), ('state', '=', 'posted')]</field>
+            <field name="context">{'group_by':['project_owner', 'partner_id']}</field>
+            <field name="view_mode">pivot</field>
+        </record>
+
+        <menuitem action="account_move_deviation_action" id="deviation_menu"
+              parent="account.menu_finance_reports" sequence="12" name="Invoice days deviation"/>
 
     </data>
 </odoo>

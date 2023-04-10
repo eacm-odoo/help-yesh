@@ -21,7 +21,8 @@ class GenerateCashFlowAnalytics(models.TransientModel):
         if not self.analysis_period or not self.number_recent_payment:
             raise UserError(_("Check analysis period and number of recent payments"))
         if self.forecast_type == "real":
-            self.env["cash.flow.analytics"].generate_real_cash_flow_analitics(self.start_date, self.end_date)
+            self.env["cash.flow.analytics"].generate_real_cash_flow_analitics(self.start_date, self.end_date,
+                                                                              self.forecast_type)
         else:
             self.env["cash.flow.analytics"].generate_predicted_cash_flow_analitics(self.start_date, self.end_date,
                                                                                    self.analysis_period,

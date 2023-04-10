@@ -7,3 +7,4 @@ access_project_project,access_project_project,model_project_project,base.group_u
 access_sales_type_revenue,access_sales_type_revenue,model_sales_type_revenue,base.group_user,1,1,1,1
 access_sales_type_departments,access_sales_type_departments,model_sales_type_departments,base.group_user,1,1,1,1
 access_cash_flow_analytics,access_cash_flow_analytics,model_cash_flow_analytics,base.group_user,1,1,1,1
+access_expected_billing_date,access_expected_billing_date,model_expected_billing_date,base.group_user,1,1,1,1

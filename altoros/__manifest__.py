@@ -39,6 +39,8 @@
         "wizard/invoice_selection_wizard_view.xml",
         # data
         "data/product_product_data.xml",
+        "data/fallowup_cron.xml",
+        "data/mail_template_data.xml",
         # report
         "report/action_report.xml",
         "report/invoice_order_report.xml",

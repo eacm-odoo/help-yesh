@@ -1,3 +1,4 @@
+import logging
 from datetime import date
 from datetime import timedelta
 
@@ -5,6 +6,7 @@ from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 from odoo.tools.misc import format_date
 
+_logger = logging.getLogger(__name__)
 
 class AccountMove(models.Model):
     _inherit = "account.move"
@@ -36,7 +38,7 @@ class AccountMove(models.Model):
         ("12", "December"),
     ], string="Billing Month")
     billing_year = fields.Char(string="Billing year")
-    project_owner = fields.Selection(string="Project Owner BL", related="project_id.project_owner")
+    project_owner = fields.Selection(string="Project Owner BL", related="project_id.project_owner", store=True)
     invoice_date = fields.Date(string="Invoice/Bill Date", default=fields.Date.today)
     track_all_fields = fields.Boolean(string="Track all fields", default=True)
     total_with_discount = fields.Float(string="Total with discount", compute="_compute_with_discount", store=True)
@@ -205,6 +207,7 @@ class AccountMove(models.Model):
     x_studio_currency = fields.Char(string="Currency OLD")
     x_studio_company_currency = fields.Char(string="Company currency OLD")
     actual_due_date = fields.Date(compute="_compute_actual_due_date", string="Actual Due Date", store=True)
+    deviation = fields.Float(string="Deviation, days", group_operator="avg")
 
     def get_report_base_filename(self):
         """Get report filename"""
@@ -383,4 +386,33 @@ class AccountMove(models.Model):
                 raise UserError(_("Project Owner BL must be selected. Go to the Project and select it."))
             if not move.sales_type or not move.sales_type_revenue:
                 raise UserError(_("Please fill in the fields Current/New and Revenue Current/New"))
+        self.calculate_deviation()
         return res
+
+    def calculate_deviation(self):
+        """Calculate devision field according invoice_date"""
+        for move_id in self:
+            if not move_id.partner_id.expected_billing_date_ids:
+                continue
+            else:
+                expected_billing_rate = sorted(move_id.partner_id.expected_billing_date_ids.mapped("billing_rate"), reverse=True)
+                if move_id.invoice_date.month == 2:
+                    expected_billing_rate = [28 if rate in (29, 30) else rate for rate in expected_billing_rate]
+                invoice_day_qty = move_id.invoice_date.day if move_id.invoice_date else False
+                if invoice_day_qty:
+                    if any([invoice_day_qty == rate for rate in expected_billing_rate]):
+                        move_id.deviation = 0
+                        continue
+                    min_qty_days_data = {abs(rate - invoice_day_qty): rate for rate in
+                                         expected_billing_rate}
+                    min_qty_days = min(min_qty_days_data.keys())
+                    min_rate = min_qty_days_data[min_qty_days]
+                    if min_rate > invoice_day_qty:
+                        min_qty_days = -min_qty_days
+                    try:
+                        if min_qty_days >= 16:
+                            move_id.deviation = 30 - min_qty_days
+                        else:
+                            move_id.deviation = min_qty_days
+                    except Exception:
+                        _logger.exception("Failed to write deviation")

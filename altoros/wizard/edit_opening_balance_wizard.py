@@ -12,16 +12,11 @@ class EditOpeningBalance(models.TransientModel):
     def recalculate_opening_balance(self):
         """Recalculate opening_balance field for cash.flow.analytics of selected date and journal_id"""
         cash_flow_analytics_ids = self.env["cash.flow.analytics"].search([
-            ("date", "=", self.date),
+            ("date", ">=", self.date),
             ("account_journal_id", "=", self.journal_id.id)
         ])
         if cash_flow_analytics_ids:
-            delta = round(self.balance / len(cash_flow_analytics_ids), 2)
-            accumulation_delta = delta
+            closed_balance = self.balance
             for cash_flow_id in cash_flow_analytics_ids:
-                cash_flow_id.opening_balance += accumulation_delta
-                accumulation_delta += delta
-        post_cash_flow_analytics_ids = self.env["cash.flow.analytics"].search([("date", ">", self.date)])
-        if post_cash_flow_analytics_ids:
-            for rec in post_cash_flow_analytics_ids:
-                rec.opening_balance += self.balance
+                cash_flow_id.opening_balance = closed_balance
+                closed_balance = self.env["cash.flow.analytics"].change_closing_balance(cash_flow_id)

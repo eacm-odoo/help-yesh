@@ -12,6 +12,10 @@
                     </xpath>
                      <xpath expr="//field[@name='property_payment_term_id']" position="after">
                         <field name="account_payment_term"/>
+                        <field name="expected_billing_date_ids" widget="many2many_tags"/>
+                    </xpath>
+                    <xpath expr="//field[@name='category_id']" position="after">
+                        <field name="is_follow_up"/>
                     </xpath>
                 </field>
             </record>

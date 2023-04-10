@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="ir_cron_auto_send_mail_fallowup" model="ir.cron">
+        <field name="name"> Auto send email for followup</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="numbercall">-1</field>
+        <field name="doall" eval="False"/>
+        <field name="model_id" ref="model_account_followup_report"/>
+        <field name="code">model._cron_send_email_followup()</field>
+        <field name="state">code</field>
+    </record>
+
+</odoo>
