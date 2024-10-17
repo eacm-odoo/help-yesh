@@ -2,7 +2,7 @@
     "name": "Altoros",
     "summary": "Altoros module",
     "description": """ Altoros module """,
-    "version": "15.0.1",
+    "version": "1.0",
     "depends": [
         "base",
         "hr",
@@ -16,9 +16,10 @@
         "sale_management",
         "report_xlsx",
     ],
-    "author": "iCode",
+    "author": "Odoo Development Services",
+    "maintainer": "Odoo Development Services",
     "license": "OPL-1",
-    "website": "https://icode.by",
+    "website": "https://www.odoo.com",
     "data": [
         "security/ir.model.access.csv",
         # views
@@ -47,6 +48,14 @@
         "report/invoice_order_report.xml",
 
     ],
+    'assets': {
+        'web.assets_backend': [
+            '/altoros/static/src/js/cash_flow_analytics.js',
+            '/altoros/static/src/js/edit_opening_balance.js',
+            '/altoros/static/src/scss/pivot_view.scss'
+
+        ],
+    },
     'qweb': [
         'static/src/xml/cash_flow_generate.xml',
     ],

@@ -103,14 +103,14 @@ class MailComposer(models.TransientModel):
         'Reply-To', default=get_default_reply_to,
         help='Reply email address. Setting the reply_to bypasses the automatic thread creation.')
 
-    def get_mail_values(self, res_ids):
+    def _prepare_mail_values(self, res_ids):
         """Generate the values that will be used by send_mail to create mail_messages
         or mail_mails. """
         self.ensure_one()
-        results = super(MailComposer, self).get_mail_values(res_ids)
+        mail_values_all = super(MailComposer, self)._prepare_mail_values(res_ids)
         for res_id in res_ids:
             # static wizard (mail.message) values
-            results[res_id].update({
+            mail_values_all[res_id].update({
                 'email_bcc': self.email_bcc,
                 'email_cc': self.email_cc,
                 'cc_recipient_ids': self.cc_recipient_ids,
@@ -119,7 +119,7 @@ class MailComposer(models.TransientModel):
                 # 'email_to': self.email_to,
             })
         if self.email_to:
-            results['to'] = {
+            mail_values_all['to'] = {
                 'subject': self.subject,
                 'body': self.body or '',
                 'parent_id': self.parent_id and self.parent_id.id,
@@ -127,7 +127,7 @@ class MailComposer(models.TransientModel):
                 'author_id': self.author_id.id,
                 'email_from': self.email_from,
                 'record_name': self.record_name,
-                'no_auto_thread': self.no_auto_thread,
+                'reply_to_force_new': self.reply_to_force_new,
                 'mail_server_id': self.mail_server_id.id,
                 'mail_activity_type_id': self.mail_activity_type_id.id,
                 'email_bcc': self.email_bcc,
@@ -138,97 +138,43 @@ class MailComposer(models.TransientModel):
                 'email_to': self.email_to,
                 'body_html': self.body or ''
                 }
-        return results
+        return mail_values_all
 
-    def send_mail(self, auto_commit=False):
-        """ Process the wizard content and proceed with sending the related
-            email(s), rendering any template patterns on the fly if needed. """
-        notif_layout = self._context.get('custom_layout')
-        # Several custom layouts make use of the model description at rendering, e.g. in the
-        # 'View <document>' button. Some models are used for different business concepts, such as
-        # 'purchase.order' which is used for a RFQ and and PO. To avoid confusion, we must use a
-        # different wording depending on the state of the object.
-        # Therefore, we can set the description in the context from the beginning to avoid falling
-        # back on the regular display_name retrieved in '_notify_prepare_template_context'.
-        model_description = self._context.get('model_description')
-        for wizard in self:
-            # Duplicate attachments linked to the email.template.
-            # Indeed, basic mail.compose.message wizard duplicates attachments in mass
-            # mailing mode. But in 'single post' mode, attachments of an email template
-            # also have to be duplicated to avoid changing their ownership.
-            if wizard.attachment_ids and wizard.composition_mode != 'mass_mail' and wizard.template_id:
-                new_attachment_ids = []
-                for attachment in wizard.attachment_ids:
-                    if attachment in wizard.template_id.attachment_ids:
-                        new_attachment_ids.append(attachment.copy({'res_model': 'mail.compose.message', 'res_id': wizard.id}).id)
-                    else:
-                        new_attachment_ids.append(attachment.id)
-                new_attachment_ids.reverse()
-                wizard.write({'attachment_ids': [(6, 0, new_attachment_ids)]})
+    def _action_send_mail_comment(self, res_ids):
+        """ Send in comment mode. It calls message_post on model, or the generic
+        implementation of it if not available (as message_notify). """
+        self.ensure_one()
+        post_values_all = self._prepare_mail_values(res_ids)
+        ActiveModel = self.env[self.model] if self.model and hasattr(self.env[self.model], 'message_post') else self.env['mail.thread']
+        if self.composition_batch:
+            # add context key to avoid subscribing the author
+            ActiveModel = ActiveModel.with_context(
+                mail_create_nosubscribe=True,
+            )
 
-            # Mass Mailing
-            mass_mode = wizard.composition_mode in ('mass_mail', 'mass_post')
-
-            Mail = self.env['mail.mail']
-            ActiveModel = self.env[wizard.model] if wizard.model and hasattr(self.env[wizard.model], 'message_post') else self.env['mail.thread']
-            if wizard.composition_mode == 'mass_post':
-                # do not send emails directly but use the queue instead
-                # add context key to avoid subscribing the author
-                ActiveModel = ActiveModel.with_context(mail_notify_force_send=False, mail_create_nosubscribe=True)
-            # wizard works in batch mode: [res_id] or active_ids or active_domain
-            if mass_mode and wizard.use_active_domain and wizard.model:
-                res_ids = self.env[wizard.model].search(safe_eval(wizard.active_domain)).ids
-            elif mass_mode and wizard.model and self._context.get('active_ids'):
-                res_ids = self._context['active_ids']
+        messages = self.env['mail.message']
+        Mail = self.env['mail.mail']
+        for res_id, post_values in post_values_all.items():
+            if ActiveModel._name == 'mail.thread':
+                post_values.pop('message_type')  # forced to user_notification
+                post_values.pop('parent_id', False)  # not supported in notify
+                if self.model:
+                    post_values['model'] = self.model
+                    post_values['res_id'] = res_id
+                message = ActiveModel.message_notify(**post_values)
+                if not message:
+                    # if message_notify returns an empty record set, no recipients where found.
+                    raise UserError(_("No recipient found."))
+                messages += message
             else:
-                res_ids = [wizard.res_id]
+                messages += ActiveModel.browse(res_id).message_post(**post_values)
 
-            batch_size = int(self.env['ir.config_parameter'].sudo().get_param('mail.batch_size')) or self._batch_size
-            sliced_res_ids = [res_ids[i:i + batch_size] for i in range(0, len(res_ids), batch_size)]
-
-            if wizard.composition_mode == 'mass_mail' or wizard.is_log or (wizard.composition_mode == 'mass_post' and not wizard.notify):  # log a note: subtype is False
-                subtype_id = False
-            elif wizard.subtype_id:
-                subtype_id = wizard.subtype_id.id
-            else:
-                subtype_id = self.env['ir.model.data'].xmlid_to_res_id('mail.mt_comment')
-
-            for res_ids in sliced_res_ids:
-                batch_mails = Mail
-                all_mail_values = wizard.get_mail_values(res_ids)
-                for res_id, mail_values in all_mail_values.items():
-                    if wizard.composition_mode == 'mass_mail':
-                        batch_mails |= Mail.create(mail_values)
-                    else:
-                        post_params = dict(
-                            message_type=wizard.message_type,
-                            subtype_id=subtype_id,
-                            email_layout_xmlid=notif_layout,
-                            add_sign=not bool(wizard.template_id),
-                            mail_auto_delete=wizard.template_id.auto_delete if wizard.template_id else False,
-                            model_description=model_description)
-                        post_params.update(mail_values)
-                        if ActiveModel._name == 'mail.thread':
-                            if wizard.model:
-                                post_params['model'] = wizard.model
-                                post_params['res_id'] = res_id
-                            if not ActiveModel.message_notify(**post_params):
-                                # if message_notify returns an empty record set, no recipients where found.
-                                raise UserError(_("No recipient found."))
-                        # elif res_id != 'to':
-                        #     ActiveModel.browse(res_id).message_post(**post_params)
-                        else:
-                            ActiveModel.browse(res_id).message_post(**post_params)
-
-                            to_mail = Mail.create(mail_values)
-                            if mail_values.get('cc_recipient_ids'):
-                                to_mail.cc_recipient_ids = [(6, 0, mail_values.get('cc_recipient_ids').ids)]
-                                to_mail.res_id = False
-                            to_mail.send(auto_commit=auto_commit)
-
-
-                if wizard.composition_mode == 'mass_mail':
-                    batch_mails.send(auto_commit=auto_commit)
+                to_mail = Mail.create(post_values_all)
+                if post_values_all.get('cc_recipient_ids'):
+                    to_mail.cc_recipient_ids = [(6, 0, post_values_all.get('cc_recipient_ids').ids)]
+                    to_mail.res_id = False
+                to_mail._action_send_mail_comment(res_ids)
+        return messages
 
 
 class Message(models.Model):
@@ -249,8 +195,8 @@ class Message(models.Model):
         'message_id', 'partner_id', string='Bcc (Partners)')
     email_to = fields.Text('To', help='Message recipients (emails)')
 
-    def message_format(self):
-        res = super(Message, self).message_format()
+    def message_format(self, format_reply=True, msg_vals=None):
+        res = super(Message, self).message_format(format_reply=True, msg_vals=None)
         partners_dict = {}
         for obj in res:
             cc_partners = ''
@@ -280,122 +226,104 @@ class Mail(models.Model):
 
     _inherit = "mail.mail"
 
-    def _send(self, auto_commit=False, raise_exception=False, smtp_session=None):
+    def _send(self, auto_commit=False, raise_exception=False, smtp_session=None, alias_domain_id=False):
         IrMailServer = self.env['ir.mail_server']
-        IrAttachment = self.env['ir.attachment']
+        # Only retrieve recipient followers of the mails if needed
+        mails_with_unfollow_link = self.filtered(lambda m: m.body_html and '/mail/unfollow' in m.body_html)
+        recipients_follower_status = (
+            None if not mails_with_unfollow_link
+            else self.env['mail.followers']._get_mail_recipients_follower_status(mails_with_unfollow_link.ids)
+        )
+
         for mail_id in self.ids:
             success_pids = []
+            failure_reason = None
             failure_type = None
             processing_pid = None
             mail = None
             try:
                 mail = self.browse(mail_id)
                 if mail.state != 'outgoing':
-                    if mail.state != 'exception' and mail.auto_delete:
-                        mail.sudo().unlink()
                     continue
-
-                # remove attachments if user send the link with the access_token
-                body = mail.body_html or ''
-                attachments = mail.attachment_ids
-                for link in re.findall(r'/web/(?:content|image)/([0-9]+)', body):
-                    attachments = attachments - IrAttachment.browse(int(link))
-
-                # load attachment binary data with a separate read(), as prefetching all
-                # `datas` (binary field) could bloat the browse cache, triggerring
-                # soft/hard mem limits with temporary data.
-                attachments = [(a['name'], base64.b64decode(a['datas']), a['mimetype'])
-                               for a in attachments.sudo().read(['name', 'datas', 'mimetype'])]
-
-                # specific behavior to customize the send email for notified partners
-                email_list = []
-                cc_list = []
-                bcc_list = []
-                if mail.email_to:
-                    email_list.append(mail._send_prepare_values())
-                for partner in mail.recipient_ids:
-                    values = mail._send_prepare_values(partner=partner)
-                    values['partner_id'] = partner
-                    email_list.append(values)
-                for partner in mail.cc_recipient_ids:
-                    cc_list += mail._send_prepare_values(
-                        partner=partner).get('email_to')
-                for partner in mail.bcc_recipient_ids:
-                    bcc_list += mail._send_prepare_values(
-                        partner=partner).get('email_to')
-
-                # headers
-                headers = {}
-                ICP = self.env['ir.config_parameter'].sudo()
-                bounce_alias = ICP.get_param("mail.bounce.alias")
-                catchall_domain = ICP.get_param("mail.catchall.domain")
-                if bounce_alias and catchall_domain:
-                    if mail.mail_message_id.is_thread_message():
-                        headers['Return-Path'] = '%s+%d-%s-%d@%s' % (bounce_alias, mail.id, mail.model, mail.res_id, catchall_domain)
-                    else:
-                        headers['Return-Path'] = '%s+%d@%s' % (bounce_alias, mail.id, catchall_domain)
-                if mail.headers:
-                    try:
-                        headers.update(safe_eval(mail.headers))
-                    except Exception:
-                        pass
 
                 # Writing on the mail object may fail (e.g. lock on user) which
                 # would trigger a rollback *after* actually sending the email.
                 # To avoid sending twice the same email, provoke the failure earlier
                 mail.write({
                     'state': 'exception',
-                    'failure_reason': _('Error without exception. Probably due do sending an email without computed recipients.'),
+                    'failure_reason': _('Error without exception. Probably due to sending an email without computed recipients.'),
                 })
                 # Update notification in a transient exception state to avoid concurrent
                 # update in case an email bounces while sending all emails related to current
                 # mail record.
                 notifs = self.env['mail.notification'].search([
                     ('notification_type', '=', 'email'),
-                    ('mail_id', 'in', mail.ids),
+                    ('mail_mail_id', 'in', mail.ids),
                     ('notification_status', 'not in', ('sent', 'canceled'))
                 ])
                 if notifs:
-                    notif_msg = _('Error without exception. Probably due do concurrent access update of notification records. Please see with an administrator.')
+                    notif_msg = _('Error without exception. Probably due to concurrent access update of notification records. Please see with an administrator.')
                     notifs.sudo().write({
                         'notification_status': 'exception',
-                        'failure_type': 'UNKNOWN',
+                        'failure_type': 'unknown',
                         'failure_reason': notif_msg,
                     })
                     # `test_mail_bounce_during_send`, force immediate update to obtain the lock.
                     # see rev. 56596e5240ef920df14d99087451ce6f06ac6d36
-                    notifs.flush(fnames=['notification_status', 'failure_type', 'failure_reason'], records=notifs)
+                    notifs.flush_recordset(['notification_status', 'failure_type', 'failure_reason'])
+
+                # protect against ill-formatted email_from when formataddr was used on an already formatted email
+                emails_from = tools.email_split_and_format(mail.email_from)
+                email_from = emails_from[0] if emails_from else mail.email_from
 
                 # build an RFC2822 email.message.Message object and send it without queuing
                 res = None
+                # TDE note: could be great to pre-detect missing to/cc and skip sending it
+                # to go directly to failed state update
+                email_list = mail._prepare_outgoing_list(recipients_follower_status)
+
+                # send each sub-email
                 for email in email_list:
-                    msg = IrMailServer.build_email(
-                        email_from=mail.email_from,
-                        email_to=email.get('email_to'),
-                        subject=mail.subject,
-                        body=email.get('body'),
-                        body_alternative=email.get('body_alternative'),
-                        email_cc=tools.email_split(mail.email_cc)+ cc_list,
-                        email_bcc=tools.email_split(mail.email_bcc) + bcc_list,
-                        reply_to=mail.reply_to,
-                        attachments=attachments,
-                        message_id=mail.message_id,
-                        references=mail.references,
-                        object_id=mail.res_id and ('%s-%s' % (mail.res_id, mail.model)),
+                    # if given, contextualize sending using alias domains
+                    if alias_domain_id:
+                        alias_domain = self.env['mail.alias.domain'].sudo().browse(alias_domain_id)
+                        SendIrMailServer = IrMailServer.with_context(
+                            domain_notifications_email=alias_domain.default_from_email,
+                            domain_bounce_address=email['headers'].get('Return-Path') or alias_domain.bounce_email,
+                        )
+                    else:
+                        SendIrMailServer = IrMailServer
+                        msg = SendIrMailServer.build_email(
+                        email_from=email_from,
+                        email_to=email['email_to'],
+                        subject=email['subject'],
+                        body=email['body'],
+                        body_alternative=email['body_alternative'],
+                        email_cc=email['email_cc'],
+                        email_bcc=email['email_bcc'],
+                        reply_to=email['reply_to'],
+                        attachments=email['attachments'],
+                        message_id=email['message_id'],
+                        references=email['references'],
+                        object_id=email['object_id'],
                         subtype='html',
                         subtype_alternative='plain',
-                        headers=headers)
-
+                        headers=email['headers'],
+                    )
                     processing_pid = email.pop("partner_id", None)
                     try:
-                        res = IrMailServer.send_email(
+                        res = SendIrMailServer.send_email(
                             msg, mail_server_id=mail.mail_server_id.id, smtp_session=smtp_session)
                         if processing_pid:
                             success_pids.append(processing_pid)
                         processing_pid = None
                     except AssertionError as error:
                         if str(error) == IrMailServer.NO_VALID_RECIPIENT:
-                            failure_type = "RECIPIENT"
+                            # if we have a list of void emails for email_list -> email missing, otherwise generic email failure
+                            if not email.get('email_to') and failure_type != "mail_email_invalid":
+                                failure_type = "mail_email_missing"
+                            else:
+                                failure_type = "mail_email_invalid"
                             # No valid recipient found for this particular
                             # mail item -> ignore error to avoid blocking
                             # delivery to next recipients, if any. If this is
@@ -404,7 +332,7 @@ class Mail(models.Model):
                                          mail.message_id, email.get('email_to'))
                         else:
                             raise
-                if res:  # mail has been sent at least once, no major exception occured
+                if res:  # mail has been sent at least once, no major exception occurred
                     mail.write({'state': 'sent', 'message_id': res, 'failure_reason': False})
                     _logger.info('Mail with ID %r and Message-Id %r successfully sent', mail.id, mail.message_id)
                     # /!\ can't use mail.state here, as mail.refresh() will cause an error
@@ -426,24 +354,55 @@ class Mail(models.Model):
                     mail.id, mail.message_id)
                 raise
             except Exception as e:
-                failure_reason = tools.ustr(e)
+                if isinstance(e, AssertionError):
+                    # Handle assert raised in IrMailServer to try to catch notably from-specific errors.
+                    # Note that assert may raise several args, a generic error string then a specific
+                    # message for logging in failure type
+                    error_code = e.args[0]
+                    if len(e.args) > 1 and error_code == IrMailServer.NO_VALID_FROM:
+                        # log failing email in additional arguments message
+                        failure_reason = tools.ustr(e.args[1])
+                    else:
+                        failure_reason = error_code
+                    if error_code == IrMailServer.NO_VALID_FROM:
+                        failure_type = "mail_from_invalid"
+                    elif error_code in (IrMailServer.NO_FOUND_FROM, IrMailServer.NO_FOUND_SMTP_FROM):
+                        failure_type = "mail_from_missing"
+                # generic (unknown) error as fallback
+                if not failure_reason:
+                    failure_reason = tools.ustr(e)
+                if not failure_type:
+                    failure_type = "unknown"
+
                 _logger.exception('failed sending mail (id: %s) due to %s', mail.id, failure_reason)
-                mail.write({'state': 'exception', 'failure_reason': failure_reason})
-                mail._postprocess_sent_message(success_pids=success_pids, failure_reason=failure_reason, failure_type='UNKNOWN')
+                mail.write({
+                    "failure_reason": failure_reason,
+                    "failure_type": failure_type,
+                    "state": "exception",
+                })
+                mail._postprocess_sent_message(
+                    success_pids=success_pids,
+                    failure_reason=failure_reason, failure_type=failure_type
+                )
                 if raise_exception:
                     if isinstance(e, (AssertionError, UnicodeEncodeError)):
                         if isinstance(e, UnicodeEncodeError):
                             value = "Invalid text: %s" % e.object
                         else:
-                            # get the args of the original error, wrap into a value and throw a MailDeliveryException
-                            # that is an except_orm, with name and value as arguments
                             value = '. '.join(e.args)
-                        raise MailDeliveryException(_("Mail Delivery Failed"), value)
+                        raise MailDeliveryException(value)
                     raise
 
             if auto_commit is True:
                 self._cr.commit()
         return True
+
+    # def _prepare_outgoing_list(self, recipients_follower_status=None):
+    #     res = super(Mail, self)._prepare_outgoing_list(recipients_follower_status)
+    #     for partner in mail.cc_recipient_ids:
+    #         res.append()
+    #         for partner in mail.bcc_recipient_ids:
+    #             bcc_list += mail._send_prepare_values(partner=partner).get('email_to')        
 
 
 class Thread(models.AbstractModel):

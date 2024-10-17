@@ -20,8 +20,8 @@ class AccountMoveLine(models.Model):
             if taxes and line.move_id.fiscal_position_id:
                 taxes = line.move_id.fiscal_position_id.map_tax(taxes, partner=line.partner_id)
             line.tax_ids = taxes
-            line.product_uom_id = line._get_computed_uom()
-            line.price_unit = line._get_computed_price_unit()
+            line.product_uom_id = line._compute_product_uom_id()
+            line.price_unit = line._compute_price_unit()
 
         if len(self) == 1:
             return {"domain": {"product_uom_id": [("category_id", "=", self.product_uom_id.category_id.id)]}}

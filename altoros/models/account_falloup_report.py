@@ -70,7 +70,7 @@ class AccountFollowupReport(models.AbstractModel):
                             attachment_ids=followup_id.join_invoices and account_move_object.message_main_attachment_id.ids or [],
                         )
 
-    def _get_lines(self, options, line_id=None):
+    def _get_followup_report_lines(self, options):
         """Delete total lines from Follow-up Reports"""
-        lines = super()._get_lines(options)
+        lines = super()._get_followup_report_lines(options)
         return [line for line in lines if line.get("class") != "total"]
