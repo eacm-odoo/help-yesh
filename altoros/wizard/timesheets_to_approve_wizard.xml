@@ -17,14 +17,22 @@
         </field>
     </record>
 
-    <act_window name="Timesheets to approve"
+    <!-- <act_window name="Timesheets to approve"
         id="action_timesheets_to_approve_wizard_form_view"
         res_model="timesheets.to.approve.wizard"
         binding_model="timesheets.to.approve.wizard"
         binding_views="form"
         view_mode="form"
         target="new"
-    />
+    /> -->
+
+    <record id="action_timesheets_to_approve_wizard_form_view" model="ir.actions.act_window">
+        <field name="name">Timesheets to approve</field>
+        <field name="res_model">timesheets.to.approve.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
 
     <menuitem id="action_timesheets_to_approve_action"
       action="action_timesheets_to_approve_wizard_form_view"

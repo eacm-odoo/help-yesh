@@ -9,8 +9,8 @@ class AccountFollowupReport(models.AbstractModel):
     _inherit = "account.followup.report"
 
     def _cron_send_email_followup(self):
-        """Send by mail the followup to all customers who has followup_level"""
-        partner_ids = self.env["res.partner"].search([("followup_level", "!=", False), ("is_follow_up", "=", True)])
+        """Send by mail the followup to all customers who has followup_line_id"""
+        partner_ids = self.env["res.partner"].search([("followup_line_id", "!=", False), ("is_follow_up", "=", True)])
         for record in partner_ids:
             options = {
                 "partner_id": record.id,
@@ -35,7 +35,7 @@ class AccountFollowupReport(models.AbstractModel):
                 if any([(date.today() - line_id.move_id.invoice_date_due).days == followup_id.delay if line_id.move_id.invoice_date_due else False
                         for line_id in non_blocked_aml_ids]):
                     account_move_object = self.env["account.move"]
-                    options["followup_level"] = (followup_id.id, followup_id.delay)
+                    options["followup_line_id"] = (followup_id.id, followup_id.delay)
                     options["keep_summary"] = False
                     body_html = self.with_context(print_mode=True, mail=True).get_html(options)
                     body_html = body_html.replace(b"o_account_reports_edit_summary_pencil",

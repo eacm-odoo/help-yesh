@@ -17,11 +17,12 @@ class RateEmployee(models.Model):
     currency_id = fields.Many2one(string="Currency", comodel_name="res.currency")
     sales_type = fields.Selection(string="Sales type", selection=[("base", "Base"), ("upsale", "Upsale"), ("cross-sale", "Cross-sale")])
 
-    @api.model
-    def create(self, vals):
+    @api.model_create_multi
+    def create(self, vals_list):
         """Validate date"""
-        self.validate_data(vals)
-        result = super(RateEmployee, self).create(vals)
+        for vals in vals_list:
+            self.validate_data(vals)
+        result = super().create(vals_list)
         return result
 
     def write(self, vals):

@@ -13,6 +13,14 @@
         <field name="model">cash.flow.analytics</field>
         <field name="arch" type="xml">
             <tree create="1" edit="1">
+                <header>
+                    <button name="action_cash_flow_generate" type="object" class="btn btn-secondary cash_flow_analytics"
+                            string="GENERATE" display="always"
+                            invisible="context.get('active_model', 'cash.flow.analytics') != 'cash.flow.analytics'"/>
+                    <button name="action_edit_opening_balance" type="object" class="btn btn-secondary edit_opening_balance"
+                            string="EDIT OPENING BALANCE" display="always"
+                            invisible="context.get('active_model', 'edit.opening.balance') != 'edit.opening.balance'"/>
+                </header>
                 <field name="date"/>
                 <field name="account_journal_id"/>
                 <field name="res_company_id"/>

@@ -342,13 +342,14 @@ class AccountMove(models.Model):
         except (AttributeError, Exception):
             return self.env[model_name].create(kwargs)
 
-    @api.model
-    def create(self, vals):
+    @api.model_create_multi
+    def create(self, vals_list):
         """Call method _check_fiscalyear_lock_date if move with invoice date and not move_lines"""
-        res = super(AccountMove, self).create(vals)
-        if not res.invoice_line_ids:
-            res._check_fiscalyear_lock_date()
-        return res
+        moves = super(AccountMove, self).create(vals_list)
+        for move in moves:
+            if not move.invoice_line_ids:
+                move._check_fiscalyear_lock_date()
+        return moves
 
     def write(self, vals):
         """Call method _check_fiscalyear_lock_date

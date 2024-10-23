@@ -31,6 +31,14 @@
         target="new"
     />
 
+
+    <record id="action_invoices_changes_wizard_form_view" model="ir.actions.act_window">
+        <field name="name">Invoices Changes</field>
+        <field name="res_model">invoices.changes.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
     <menuitem id="invoices_changes_action"
       action="action_invoices_changes_wizard_form_view"
       parent="account.menu_finance_reports"

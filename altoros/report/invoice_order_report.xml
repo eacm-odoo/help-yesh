@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <template id="invoice_order_report_inherit" inherit_id="account.report_invoice_document">
-        <xpath expr="//t/div/p" position="replace"/>
+        <!-- <xpath expr="//t/div/p" position="replace"/> -->
         <xpath expr="//thead/tr/th[@name='th_quantity']" position="replace">
             <th></th>
         </xpath>

@@ -14,14 +14,21 @@
             </record>
         </data>
 
-       <act_window name="Create invoice"
+       <!-- <act_window name="Create invoice"
             id="create_invoice_action"
             res_model="timesheet.filling"
             binding_model="account.analytic.line"
             binding_views="form"
             view_mode="form"
             target="new"
-        />
+        /> -->
+
+        <record id="create_invoice_action" model="ir.actions.act_window">
+            <field name="name">Create invoice</field>
+            <field name="res_model">timesheet.filling</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
 
     <menuitem id="menu_project_create_invoice" action="create_invoice_action" name="Create invoice" parent="hr_timesheet.timesheet_menu_root" sequence="100"/>
 

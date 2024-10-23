@@ -2,7 +2,7 @@
     "name": "Altoros",
     "summary": "Altoros module",
     "description": """ Altoros module """,
-    "version": "1.0",
+    "version": "1.3.0",
     "depends": [
         "base",
         "hr",
@@ -12,7 +12,6 @@
         "account_accountant",
         "timesheet_grid",
         "planning",
-        "l10n_generic_coa",
         "sale_management",
         "report_xlsx",
     ],
@@ -31,7 +30,7 @@
         "views/project_task_views.xml",
         "views/sale_order_views.xml",
         "views/cash_flow_analytics_view.xml",
-        "views/assets.xml",
+        #"views/assets.xml",
         # wizard
         "wizard/edit_opening_balance_wizard_view.xml",
         "wizard/generate_cash_flow_analytics_wizard_view.xml",
@@ -50,13 +49,13 @@
     ],
     'assets': {
         'web.assets_backend': [
-            '/altoros/static/src/js/cash_flow_analytics.js',
-            '/altoros/static/src/js/edit_opening_balance.js',
-            '/altoros/static/src/scss/pivot_view.scss'
+            #'/altoros/static/src/js/cash_flow_analytics.js',
+            #'/altoros/static/src/js/edit_opening_balance.js',
+            #'/altoros/static/src/scss/pivot_view.scss'
 
         ],
     },
     'qweb': [
-        'static/src/xml/cash_flow_generate.xml',
+        #'static/src/xml/cash_flow_generate.xml',
     ],
 }

@@ -29,12 +29,12 @@ class CashFlowAnalytics(models.Model):
         last_date = end_date
         account_payment_ids = self.env["account.payment"].search(
             [("payment_type", "!=", "transfer"), ("state", "not in", ["draft", "cancelled"]),
-             ("payment_date", "<", fields.Date.today()), ("payment_date", ">=", start_date)]).sorted("payment_date")
+             ("date", "<", fields.Date.today()), ("date", ">=", start_date)]).sorted("date")
         for account_payment_id in account_payment_ids:
             cash_flow_analytics_id = self._create_real_cash_flow_analytics(
                 account_payment_id,
                 account_payment_id.partner_type,
-                account_payment_id.payment_date,
+                account_payment_id.date,
             )
             is_outbound_type = account_payment_id.payment_type == "outbound"
             outbound_amount = -account_payment_id.amount if is_outbound_type else account_payment_id.amount
@@ -44,9 +44,9 @@ class CashFlowAnalytics(models.Model):
                 "intercompany_in_amount": account_payment_id.amount if cash_flow_analytics_id.intercompany_in_id else 0,
                 "intercompany_out_amount": outbound_amount if cash_flow_analytics_id.intercompany_out_id else 0,
             })
-            last_date = account_payment_id.payment_date
+            last_date = account_payment_id.date
         account_move_ids = self.env["account.move"].search(
-            [("invoice_payment_state", "=", "not_paid"), ("state", "=", "posted"),
+            [("payment_state", "=", "not_paid"), ("state", "=", "posted"),
              ("actual_due_date", ">=", fields.Date.today()), ("actual_due_date", "<=", end_date)]).sorted(
             "actual_due_date")
         for account_move_id in account_move_ids:
@@ -168,7 +168,7 @@ class CashFlowAnalytics(models.Model):
         account_payment_ids = self.env["account.payment"].search(
             [("payment_type", "!=", "transfer"), ("state", "in", ["posted", "reconciled"]),
              ("journal_id", "=", journal_id), ("partner_id", "=", partner_id),
-             ("payment_date", ">=", recent_date)])
+             ("date", ">=", recent_date)])
         if account_payment_ids:
             amount_list = account_payment_ids[-payment_number::].mapped("amount")
             for cash_flow_id in cash_flow_ids:
@@ -186,3 +186,23 @@ class CashFlowAnalytics(models.Model):
             date_time = cash_flow_ids[1].date - cash_flow_ids[0].date
             date_range = date_time if date_time > timedelta(days=10) else timedelta(days=10)
         return date_range
+
+    def action_cash_flow_generate(self):
+        return {
+            "name": "Generate cash flow analitics",
+            "type": "ir.actions.act_window",
+            "res_model": "generate.cash.flow.analytics",
+            "target": "new",
+            "views": [[False, "form"]],
+            "context": {"is_modal": True},
+        }
+
+    def action_edit_opening_balance(self):
+        return {
+            "name": "Edit Opening Balance",
+            "type": "ir.actions.act_window",
+            "res_model": "edit.opening.balance",
+            "target": "new",
+            "views": [[False, "form"]],
+            "context": {"is_modal": True},
+        }

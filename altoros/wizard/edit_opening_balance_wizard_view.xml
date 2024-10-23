@@ -18,13 +18,20 @@
         </field>
     </record>
 
-    <act_window name="Edit opening balance"
+    <!-- <act_window name="Edit opening balance"
         id="action_edit_opening_balance_form_view"
         res_model="edit.opening.balance"
         binding_model="edit.opening.balance"
         binding_views="form"
         view_mode="form"
         target="new"
-    />
+    /> -->
+
+    <record id="action_edit_opening_balance_form_view" model="ir.actions.act_window">
+        <field name="name">Edit opening balance</field>
+        <field name="res_model">edit.opening.balance</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
 
 </odoo>

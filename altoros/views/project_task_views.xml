@@ -6,7 +6,7 @@
                 <field name="model">project.task</field>
                 <field name="inherit_id" ref="project.view_task_form2"/>
                 <field name="arch" type="xml">
-                    <xpath expr="//field[@name='user_id']" position="after">
+                    <xpath expr="//field[@name='user_ids']" position="after">
                         <field name="x_studio_assigned_employee"/>
                     </xpath>
                 </field>

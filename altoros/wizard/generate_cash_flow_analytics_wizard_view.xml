@@ -9,8 +9,8 @@
                     <field name="start_date"/>
                     <field name="end_date"/>
                     <field name="forecast_type" widget="radio"/>
-                    <field name="analysis_period" attrs="{'invisible': [('forecast_type','=', 'real')]}"/>
-                    <field name="number_recent_payment" attrs="{'invisible': [('forecast_type','=', 'real')]}"/>
+                    <field name="analysis_period" invisible="forecast_type == 'real'"/>
+                    <field name="number_recent_payment" invisible="forecast_type == 'real'"/>
                  </group>
                 <footer>
                     <button name="generate_cash_flow_analytics" string="Generate" type="object"/>
@@ -20,13 +20,20 @@
         </field>
     </record>
 
-    <act_window name="Generate Cash Flow Analitics"
+    <!-- <act_window name="Generate Cash Flow Analitics"
         id="action_generate_cash_flow_analytics_form_view"
         res_model="generate.cash.flow.analytics"
         binding_model="generate.cash.flow.analytics"
         binding_views="form"
         view_mode="form"
         target="new"
-    />
+    /> -->
+
+    <record id="action_generate_cash_flow_analytics_form_view" model="ir.actions.act_window">
+        <field name="name">Generate Cash Flow Analitics</field>
+        <field name="res_model">generate.cash.flow.analytics</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
 
 </odoo>

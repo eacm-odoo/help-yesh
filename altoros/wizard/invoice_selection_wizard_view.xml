@@ -16,14 +16,21 @@
         </field>
     </record>
 
-    <act_window name="Timesheets Report"
+    <!-- <act_window name="Timesheets Report"
         id="action_invoice_selection_wizard_form_view"
         res_model="invoice.selection.wizard"
         binding_model="invoice.selection.wizard"
         binding_views="form"
         view_mode="form"
         target="new"
-    />
+    /> -->
+
+    <record id="action_invoice_selection_wizard_form_view" model="ir.actions.act_window">
+        <field name="name">Timesheets Report</field>
+        <field name="res_model">generate.cash.flow.analytics</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
 
     <menuitem id="invoice_selection_menu"
       action="action_invoice_selection_wizard_form_view"

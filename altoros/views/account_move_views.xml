@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
     <data>
+
         <record id="view_account_move_form_inherit" model="ir.ui.view">
             <field name="name">inherit.invoice.form</field>
             <field name="model">account.move</field>
             <field name="inherit_id" ref="account.view_move_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='partner_id']" position="replace">
-                    <field name="partner_id" nolabel="1" attrs="{'invisible': [('type', 'not in', ('out_invoice', 'out_refund', 'in_invoice', 'in_refund', 'out_receipt', 'in_receipt'))]}"/>
-                    <field name="partner_id" nolabel="1" invisible="type not in ('out_invoice', 'out_refund', 'in_invoice', 'in_refund', 'out_receipt', 'in_receipt')"/>             
+                    <field name="partner_id" nolabel="1" invisible="move_type not in ('out_invoice', 'out_refund', 'in_invoice', 'in_refund', 'out_receipt', 'in_receipt')"/>             
                 </xpath>
-                 <xpath expr="//field[@name='ref']" position="after">
+                 <xpath expr="//field[@name='ref']" position="before">
                     <field name="actual_due_date" invisible="1"/>
                     <field name="deviation" invisible="1"/>
                 </xpath>
@@ -166,6 +166,10 @@
                 </xpath>
             </field>
         </record>
+
+
+
+        
 
         <record id="account_move_tree" model="ir.ui.view">
             <field name="name">account.move.inherit.tree</field>
